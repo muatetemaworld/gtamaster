@@ -399,3 +399,4 @@ a.player__btn,a.vcard__play{text-decoration:none}
 .readmore ul{list-style:none;padding:0;margin:0;display:grid;gap:.55rem}
 .readmore a{color:var(--cian);font-weight:600}
 .readmore span{color:var(--txt-2);font-size:.85rem}
+.guia__faqlink{margin:2.4rem 0 1.4rem;color:var(--txt-2)}.guia__faqlink a{color:var(--cian);font-weight:600}

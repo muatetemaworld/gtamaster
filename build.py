@@ -29,11 +29,7 @@ def fecha(v):
     return f"{dt.day} {MESES[dt.month-1]} {dt.year}"
 def vurl(v): return f"{SITE}/videos/{v['slug']}/"
 
-FAQ = [
- ("¿Cuándo sale GTA 6?", "Grand Theft Auto VI sale el 19 de noviembre de 2026. Rockstar Games y Take-Two han confirmado esa fecha para PlayStation 5 y Xbox Series X|S."),
- ("¿GTA 6 sale en PC?", "No en el lanzamiento. Las plataformas anunciadas son PS5 y Xbox Series X|S; Rockstar no ha dado fecha para la versión de PC."),
- ("¿Quiénes son los protagonistas de GTA 6?", "Jason Duval y Lucia, una pareja que se mete en el mundo criminal de Leonida. En GTA MASTER tienes un vídeo dedicado a cada uno."),
- ("¿Dónde transcurre GTA 6?", "En Leonida, un estado ficticio inspirado en Florida. Su gran ciudad es Vice City, inspirada en Miami, y el mapa incluye zonas como los Cayos, los pantanos de Grassrivers, Port Gellhorn, Ambrosia y Mount Kalaga."),
+FAQ_EXTRA = [
  ("¿Quién presenta la radio latina de GTA 6?", "Cocoteo FM, la emisora de música latina contemporánea, la presentan Bad Bunny y RaiNao, en los papeles de El Martillo y La Gata."),
  ("¿Qué es GTA MASTER?", "Un canal de YouTube en español dedicado a GTA 6: detalles que no viste, personajes, mapa, curiosidades y análisis hechos con material oficial de Rockstar, sin filtraciones. Es un canal de fans, no oficial."),
 ]
@@ -663,6 +659,8 @@ GUIA_FUENTES = [
  ("TweakTown: GTA Online seguirá tras GTA 6", "https://tweaktown.com/news/113044/gta-online-will-continue-after-gta-6s-release-take-two-reiterates/index.html"),
 ]
 
+FAQ = GUIA_FAQ + FAQ_EXTRA  # todas las preguntas viven en el apartado «Preguntas» de la portada
+
 def build_guia():
     rel = "../"; canon = SITE + "/gta-6/"
     title = "GTA 6: fecha, precio, PC, mapa y todo lo que sabemos"
@@ -674,12 +672,11 @@ def build_guia():
         return f'<a href="{rel}blog/{slug}/">{esc(text)}</a>' if any(p["slug"] == slug for p in POSTS) else esc(text)
     toc = [("fecha", "Fecha y hora"), ("precio", "Precio y ediciones"), ("plataformas", "PS5, Xbox y PC"), ("tamano", "Cuánto ocupa"),
            ("rendimiento", "Fps y resolución"), ("notas", "Notas"), ("duracion", "Duración"), ("historia", "Historia y personajes"),
-           ("mapa", "Mapa de Leonida"), ("musica", "Música y radios"), ("trucos", "Trucos"), ("online", "GTA Online"), ("faq", "Preguntas")]
+           ("mapa", "Mapa de Leonida"), ("musica", "Música y radios"), ("trucos", "Trucos"), ("online", "GTA Online")]
     ficha = [("Lanzamiento", "19 de noviembre de 2026"), ("Hora en España", "00:00 (peninsular)"), ("Plataformas", "PS5, PS5 Pro, Xbox Series X|S"),
              ("PC", "Sin fecha anunciada"), ("Precio", "79,99 € estándar · 99,99 € Ultimate"), ("Tamaño", "Hasta 212 GB"),
              ("Fps", "30 en todas las consolas"), ("Duración", "Unas 80 h la historia"), ("Metacritic", "99"), ("Desarrolla", "Rockstar Games")]
     tabla = "".join(f"<tr><th scope=\"row\">{esc(a)}</th><td>{esc(b)}</td></tr>" for a, b in ficha)
-    faq_html = "".join(f"<details><summary>{esc(q)}</summary><p>{esc(a)}</p></details>" for q, a in GUIA_FAQ)
     src = "".join(f'<li><a href="{u}" target="_blank" rel="noopener noreferrer">{esc(n)}</a></li>' for n, u in GUIA_FUENTES)
     chips = "".join(f'<a class="chip" href="#{i}">{esc(t)}</a>' for i, t in toc)
     pjs = ", ".join(f'<a href="{rel}personajes/#{c["slug"]}">{esc(c["n"])}</a>' for c in CAST[2:])
@@ -693,7 +690,6 @@ def build_guia():
          "publisher": {"@type": "Organization", "name": "Rockstar Games"}, "author": {"@type": "Organization", "name": "Rockstar Games"},
          "offers": [{"@type": "Offer", "name": "Edición estándar", "price": "79.99", "priceCurrency": "EUR"},
                     {"@type": "Offer", "name": "Ultimate Edition", "price": "99.99", "priceCurrency": "EUR"}]},
-        {"@type": "FAQPage", "@id": canon + "#faq", "mainEntity": [{"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in GUIA_FAQ]},
         {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Inicio", "item": SITE + "/"},
                                                         {"@type": "ListItem", "position": 2, "name": "Guía de GTA 6", "item": canon}]}]}
     h = head(title + " | GTA MASTER", desc, canon, SITE + "/assets/img/og-gta-master.jpg", rel, schema)
@@ -732,7 +728,7 @@ def build_guia():
 <h2 id="online">¿Y GTA Online?</h2>
 <p>Rockstar no ha detallado el modo online de GTA 6. Take-Two ha confirmado que seguirá actualizando GTA Online después del lanzamiento.</p>
 </div>
-<section class="faq guia__faq" id="faq" aria-labelledby="t-gfaq"><h2 id="t-gfaq" class="h2" style="font-size:clamp(2rem,1.4rem + 2vw,3rem)">Preguntas frecuentes sobre GTA 6</h2>{faq_html}</section>
+<p class="guia__faqlink">¿Tienes una duda concreta? Tienes todas las <a href="{rel}#faq">preguntas frecuentes sobre GTA 6</a> en la portada.</p>
 <aside class="sources" aria-label="Fuentes"><h2>Fuentes</h2><ul>{src}</ul><p>Guía de fans, no oficial. La actualizamos cuando Rockstar confirma algo nuevo.</p></aside>
 <p><a class="btn btn--yt" href="{SUB}" target="_blank" rel="noopener">{YT_ICON}<span>Más GTA 6 en YouTube</span></a></p>
 </div></main>
