@@ -384,3 +384,18 @@ a.player__btn,a.vcard__play{text-decoration:none}
 .comments__note a{color:var(--cian)}
 #disqus_thread{margin-top:1rem;border-radius:16px}
 #disqus_thread:not(:empty){background:#f6f1ff;padding:1rem;color:#1a1040}
+
+/* ---------- guía pilar ---------- */
+.guia{padding-top:2rem}
+.ficha caption{caption-side:top;text-align:left;font-family:var(--f-ui);font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--oro,#FFC83E);padding:0 0 .6rem}
+.ficha th{text-align:left;color:var(--crema);width:42%}
+.guia .post__body h2{scroll-margin-top:84px}
+.guia__faq{margin:3rem 0 2rem}
+.guia__faq details{border:1px solid var(--line);border-radius:14px;padding:1rem 1.2rem;margin:.6rem 0;background:rgba(255,255,255,.03)}
+.guia__faq summary{cursor:pointer;font-weight:600;color:var(--crema)}
+.guia__faq p{color:var(--txt-2);margin:.7rem 0 0}
+.readmore{margin:2.2rem 0 0;padding:1.3rem 1.5rem;border:1px solid var(--line);border-radius:18px;background:rgba(60,208,226,.06)}
+.readmore h2{font-family:var(--f-ui);font-weight:700;text-transform:uppercase;font-size:1.3rem;margin:0 0 .7rem;color:var(--crema)}
+.readmore ul{list-style:none;padding:0;margin:0;display:grid;gap:.55rem}
+.readmore a{color:var(--cian);font-weight:600}
+.readmore span{color:var(--txt-2);font-size:.85rem}

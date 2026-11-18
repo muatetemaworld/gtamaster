@@ -84,6 +84,9 @@ CAST_SOURCES = [("Rockstar Games: personajes de GTA VI", "https://www.rockstarga
                 ("PC Gamer: GTA 6 characters", "https://www.pcgamer.com/games/action/grand-theft-auto/gta6-characters"),
                 ("Stevivor: GTA 6 characters", "https://stevivor.com/guides/gta-6-characters/")]
 
+# Clave pública de IndexNow (Bing, Yandex…): el archivo <clave>.txt está en la raíz.
+INDEXNOW = "8ca4c57fdd33e60aabbfda8bf2fbff7a"
+
 # ---------- seguridad ----------
 # GitHub Pages no deja enviar cabeceras HTTP, así que la política de seguridad
 # va en una etiqueta <meta>. Solo se ejecutan scripts de la propia web (nada en
@@ -170,7 +173,7 @@ def head(title, desc, canon, img, rel, schema, extra="", csp=None):
 <header class="nav">
   <a class="nav__brand" href="{rel or './'}" aria-label="GTA MASTER, inicio"><img src="{rel}assets/img/icon-192.png" width="46" height="46" alt=""><span>GTA MASTER</span></a>
   <nav aria-label="Principal"><ul class="nav__links">
-    <li><a href="{rel}#videos">Vídeos</a></li><li><a href="{rel}personajes/">Personajes</a></li><li><a href="{rel}#leonida">Leonida</a></li><li><a href="{rel}blog/">Blog</a></li><li><a href="{rel}#faq">Preguntas</a></li>
+    <li><a href="{rel}gta-6/">Guía GTA 6</a></li><li><a href="{rel}#videos">Vídeos</a></li><li><a href="{rel}personajes/">Personajes</a></li><li><a href="{rel}#leonida">Leonida</a></li><li><a href="{rel}blog/">Blog</a></li><li><a href="{rel}#faq">Preguntas</a></li>
   </ul></nav>
   <a class="btn btn--yt" href="{SUB}" target="_blank" rel="noopener">{YT_ICON}<span>Suscríbete</span></a>
 </header>
@@ -268,8 +271,8 @@ MODAL = '''<dialog class="modal" id="modal" aria-label="Reproductor de vídeo">
 def build_home():
     feat = next(v for v in V if v["id"] == "pgMlP92hjTY")
     coco = BY["P1LpnlrMHhg"]
-    title = "GTA 6 en Español: Secretos, Detalles y Análisis | GTA MASTER"
-    desc = "GTA 6 en español: detalles que no viste, Jason y Lucia, el mapa de Leonida y Vice City, curiosidades y análisis de cada tráiler. Vídeos de GTA MASTER."
+    title = "GTA 6 en español: noticias, guía y trucos | GTA MASTER"
+    desc = "GTA 6 en español: noticias cada día, guía con fecha, precio y PC, personajes, mapa de Leonida, trucos y vídeos con los detalles que no viste."
     schema = {"@context": "https://schema.org", "@graph": [
         {"@type": "WebSite", "@id": SITE + "/#web", "url": SITE + "/", "name": BRAND, "alternateName": ["GTA MASTER VI", "GTA Master 6"], "inLanguage": "es", "publisher": {"@id": SITE + "/#org"}},
         ORG,
@@ -302,7 +305,7 @@ def build_home():
     <img class="hero__logo" src="assets/img/logo-gta-master-520.webp" srcset="assets/img/logo-gta-master-520.webp 520w, assets/img/logo-gta-master-900.webp 900w" sizes="(max-width:760px) 74vw, 540px" width="1166" height="968" alt="Logo de GTA MASTER, canal de GTA 6 en español">
     <p class="hero__kicker px">Canal de GTA VI en español</p>
     <h1 id="h1">GTA 6 en español: secretos, detalles y análisis de Grand Theft Auto VI</h1>
-    <div class="hero__cta"><a class="btn btn--yt" href="{SUB}" target="_blank" rel="noopener">{YT_ICON}<span>Suscríbete gratis</span></a><a class="btn btn--ghost" href="#videos">Ver los vídeos</a></div>
+    <div class="hero__cta"><a class="btn btn--yt" href="{SUB}" target="_blank" rel="noopener">{YT_ICON}<span>Suscríbete gratis</span></a><a class="btn btn--ghost" href="gta-6/">Guía de GTA 6</a></div>
   </div>
   <div class="hero__night" aria-hidden="true"><p class="big"><span class="grad-text">Cae la noche</span><span class="stroke">en Vice City</span></p></div>
   <div class="hero__scroll" aria-hidden="true"><span class="px">Desliza</span><i></i></div>
@@ -386,6 +389,24 @@ def build_home():
     open(os.path.join(OUT, "index.html"), "w").write(h + body + footer(rel))
 
 # ---------- PÁGINA DE VÍDEO ----------
+GUIA_ANCLA = {"Personajes": ("historia", "Historia y personajes de GTA 6"), "Leonida": ("mapa", "El mapa de GTA 6: Leonida y Vice City"),
+              "Mecánicas": ("rendimiento", "Fps, tamaño y cómo funciona GTA 6"), "Historia": ("historia", "La historia de GTA 6"),
+              "Curiosidades": ("musica", "Música, radios y curiosidades de GTA 6"), "Análisis": ("notas", "Notas y análisis de GTA 6"),
+              "Shorts": ("fecha", "Fecha, precio y todo sobre GTA 6")}
+def _palabras(t):
+    return {w for w in re.findall(r"[a-záéíóúñ0-9]{4,}", t.lower())} - {"gta", "grand", "theft", "auto", "rockstar", "sobre", "como", "todo", "para", "este", "esta"}
+def related_posts(text, n=2, excluir=None):
+    q = _palabras(text)
+    cands = [p for p in POSTS if p["slug"] != excluir]
+    cands.sort(key=lambda p: (len(q & _palabras(p["title"] + " " + " ".join(p.get("tags", [])))), p["date"]), reverse=True)
+    return cands[:n]
+def sigue_leyendo(rel, cat, text, excluir=None):
+    a, t = GUIA_ANCLA.get(cat, ("fecha", "Todo sobre GTA 6"))
+    items = [f'<li><a href="{rel}gta-6/#{a}">{esc(t)}</a> <span>· Guía GTA 6</span></li>']
+    if cat in ("Personajes", "Historia"): items.append(f'<li><a href="{rel}personajes/">Todos los personajes de GTA 6</a> <span>· Fichas</span></li>')
+    items += [f'<li><a href="{rel}blog/{p["slug"]}/">{esc(p["title"])}</a> <span>· Noticia</span></li>' for p in related_posts(text, 2, excluir)]
+    return f'<nav class="readmore" aria-label="Sigue leyendo"><h2>Sigue leyendo</h2><ul>{"".join(items)}</ul></nav>'
+
 def build_video(v):
     rel = "../../"
     canon = vurl(v)
@@ -423,6 +444,7 @@ def build_video(v):
     {f'<h2>Puntos clave</h2><ul class="points">{pts}</ul>' if pts else ""}
     <p><a class="btn btn--yt" href="https://www.youtube.com/watch?v={v["id"]}" target="_blank" rel="noopener">{YT_ICON}<span>Verlo en YouTube</span></a></p>
     <p style="font-size:.9rem">Título en YouTube: «{esc(v["yt"])}». Análisis hecho con material oficial de Rockstar Games, sin filtraciones.</p>
+    {sigue_leyendo(rel, v["cat"], v["h1"] + " " + " ".join(v.get("kw", [])))}
   </article>
   <aside aria-label="Vídeos relacionados"><h2>Sigue viendo</h2>{rels}
     <p style="margin-top:1.4rem"><a class="link-arrow" href="{rel}videos/">Todos los vídeos de GTA 6 →</a></p></aside>
@@ -524,6 +546,7 @@ def build_posts():
     <aside class="sources" aria-label="Fuentes"><h2>Fuentes</h2><ul>{src}</ul>
       <p>Las noticias de GTA MASTER se basan en las fuentes citadas. Si algo es un rumor, lo indicamos.</p></aside>
     <p><a class="btn btn--yt" href="{SUB}" target="_blank" rel="noopener">{YT_ICON}<span>Más GTA 6 en YouTube</span></a></p>
+    {sigue_leyendo(rel, p["cat"], p["title"] + " " + " ".join(p.get("tags", [])), p["slug"])}
     {comentarios(p, canon, rel)}
   </div>
 </article>
@@ -614,6 +637,109 @@ def build_personajes():
     d = os.path.join(OUT, "personajes"); os.makedirs(d, exist_ok=True)
     open(os.path.join(d, "index.html"), "w").write(h + body + footer(rel))
 
+# ---------- GUÍA PILAR /gta-6/ ----------
+GUIA_FAQ = [
+ ("¿Cuándo sale GTA 6?", "GTA 6 sale el jueves 19 de noviembre de 2026 en PlayStation 5 y Xbox Series X|S. En España se desbloquea a las 00:00 del 19 de noviembre, hora peninsular."),
+ ("¿Cuánto cuesta GTA 6?", "En España, la edición estándar cuesta 79,99 € y la Ultimate Edition 99,99 €. En Estados Unidos, 79,99 y 99,99 dólares."),
+ ("¿GTA 6 sale en PC?", "No en el lanzamiento. Rockstar solo ha anunciado PS5 y Xbox Series X|S y no hay fecha para PC. Take-Two ha dicho que los jugadores de consola son su público principal."),
+ ("¿Cuánto ocupa GTA 6?", "Hasta 212 GB, según la consola. La precarga para las reservas digitales empezó el 10 de noviembre."),
+ ("¿La edición física de GTA 6 trae disco?", "No. La caja incluye un código de descarga, así que hace falta el mismo espacio y conexión a Internet que en digital."),
+ ("¿A cuántos fps va GTA 6?", "A 30 fps en todas las consolas, incluida PS5 Pro. Rockstar no ha confirmado un modo a 60 fps."),
+ ("¿Cuánto dura GTA 6?", "Unas 80 horas la historia con algunos objetivos opcionales, según Rob Nelson, de Rockstar North. Completarlo todo lleva bastante más."),
+ ("¿Qué nota tiene GTA 6?", "Un 99 en Metacritic con 146 reseñas y un 99 en OpenCritic el día antes del lanzamiento, con dieces en IGN, GameSpot y Game Informer."),
+ ("¿Quiénes son los protagonistas de GTA 6?", "Jason Duval y Lucia Caminos, una pareja que se mete en el crimen de Leonida. Es la primera vez que un GTA principal tiene una protagonista."),
+ ("¿Dónde transcurre GTA 6?", "En Leonida, un estado ficticio inspirado en Florida, con Vice City (inspirada en Miami) como gran ciudad. Según Rockstar North, Vice City es el doble de grande que Los Santos de GTA V."),
+ ("¿GTA 6 tiene trucos?", "La saga siempre los ha tenido, pero Rockstar no ha publicado la lista oficial de trucos de GTA 6. La añadiremos en cuanto esté comprobada tras el lanzamiento."),
+]
+GUIA_FUENTES = [
+ ("Rockstar Games: Grand Theft Auto VI", "https://www.rockstargames.com/VI"),
+ ("Vandal: guía de reserva, precio y ediciones de GTA 6", "https://vandal.elespanol.com/noticia/1350791112/guia-de-reserva-de-gta-6-precio-hora-ediciones-y-todas-las-novedades-confirmadas-por-rockstar/"),
+ ("God is a Geek: Take-Two y la versión de PC", "https://godisageek.com/?p=308419"),
+ ("GamesRadar+: GTA 6 ocupa 212 GB", "https://gamesradar.com/games/grand-theft-auto/rockstar-confirms-gta-6-is-212gb-pre-loading-opens-earlier-than-previously-announced-for-digital-orders"),
+ ("Notebookcheck: 30 fps en consolas", "https://notebookcheck.net/Rockstar-reveals-GTA-6-console-performance-targets-and-PS5-Pro-upgrades.1447121.0.html"),
+ ("Tom's Guide: resumen de reseñas", "https://www.tomsguide.com/news/live/gta-6-review-roundup-live-updates"),
+ ("GamesRadar+: GTA 6 dura unas 80 horas", "https://www.gamesradar.com/games/grand-theft-auto/how-long-is-gta-6-about-80-hours-according-to-one-rockstar-devs-playthrough/"),
+ ("Insider Gaming: Vice City es el doble que Los Santos", "https://insider-gaming.com/gta-6-vice-city-twice-size-los-santos-map/"),
+ ("TweakTown: GTA Online seguirá tras GTA 6", "https://tweaktown.com/news/113044/gta-online-will-continue-after-gta-6s-release-take-two-reiterates/index.html"),
+]
+
+def build_guia():
+    rel = "../"; canon = SITE + "/gta-6/"
+    title = "GTA 6: fecha, precio, PC, mapa y todo lo que sabemos"
+    desc = "Guía de GTA 6 en español: fecha y hora de lanzamiento, precio y ediciones, si sale en PC, cuánto ocupa, 30 fps, duración, mapa, personajes y trucos."
+    def vl(slug_part, text):
+        v = next((x for x in V if slug_part in x["slug"]), None)
+        return f'<a href="{rel}videos/{v["slug"]}/">{esc(text)}</a>' if v else esc(text)
+    def pl(slug, text):
+        return f'<a href="{rel}blog/{slug}/">{esc(text)}</a>' if any(p["slug"] == slug for p in POSTS) else esc(text)
+    toc = [("fecha", "Fecha y hora"), ("precio", "Precio y ediciones"), ("plataformas", "PS5, Xbox y PC"), ("tamano", "Cuánto ocupa"),
+           ("rendimiento", "Fps y resolución"), ("notas", "Notas"), ("duracion", "Duración"), ("historia", "Historia y personajes"),
+           ("mapa", "Mapa de Leonida"), ("musica", "Música y radios"), ("trucos", "Trucos"), ("online", "GTA Online"), ("faq", "Preguntas")]
+    ficha = [("Lanzamiento", "19 de noviembre de 2026"), ("Hora en España", "00:00 (peninsular)"), ("Plataformas", "PS5, PS5 Pro, Xbox Series X|S"),
+             ("PC", "Sin fecha anunciada"), ("Precio", "79,99 € estándar · 99,99 € Ultimate"), ("Tamaño", "Hasta 212 GB"),
+             ("Fps", "30 en todas las consolas"), ("Duración", "Unas 80 h la historia"), ("Metacritic", "99"), ("Desarrolla", "Rockstar Games")]
+    tabla = "".join(f"<tr><th scope=\"row\">{esc(a)}</th><td>{esc(b)}</td></tr>" for a, b in ficha)
+    faq_html = "".join(f"<details><summary>{esc(q)}</summary><p>{esc(a)}</p></details>" for q, a in GUIA_FAQ)
+    src = "".join(f'<li><a href="{u}" target="_blank" rel="noopener noreferrer">{esc(n)}</a></li>' for n, u in GUIA_FUENTES)
+    chips = "".join(f'<a class="chip" href="#{i}">{esc(t)}</a>' for i, t in toc)
+    pjs = ", ".join(f'<a href="{rel}personajes/#{c["slug"]}">{esc(c["n"])}</a>' for c in CAST[2:])
+    schema = {"@context": "https://schema.org", "@graph": [ORG,
+        {"@type": "Article", "@id": canon + "#article", "headline": title, "description": desc, "inLanguage": "es",
+         "datePublished": "2026-11-18T20:30:00+01:00", "dateModified": "2026-11-18T20:30:00+01:00", "mainEntityOfPage": canon,
+         "image": [SITE + "/assets/img/og-gta-master.jpg"], "author": {"@type": "Organization", "name": "Redacción GTA MASTER", "url": SITE + "/"},
+         "publisher": {"@id": SITE + "/#org"}, "about": {"@id": canon + "#game"}, "citation": [u for _, u in GUIA_FUENTES]},
+        {"@type": "VideoGame", "@id": canon + "#game", "name": "Grand Theft Auto VI", "alternateName": ["GTA 6", "GTA VI"],
+         "genre": ["Acción", "Mundo abierto"], "gamePlatform": ["PlayStation 5", "Xbox Series X|S"], "datePublished": "2026-11-19",
+         "publisher": {"@type": "Organization", "name": "Rockstar Games"}, "author": {"@type": "Organization", "name": "Rockstar Games"},
+         "offers": [{"@type": "Offer", "name": "Edición estándar", "price": "79.99", "priceCurrency": "EUR"},
+                    {"@type": "Offer", "name": "Ultimate Edition", "price": "99.99", "priceCurrency": "EUR"}]},
+        {"@type": "FAQPage", "@id": canon + "#faq", "mainEntity": [{"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in GUIA_FAQ]},
+        {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Inicio", "item": SITE + "/"},
+                                                        {"@type": "ListItem", "position": 2, "name": "Guía de GTA 6", "item": canon}]}]}
+    h = head(title + " | GTA MASTER", desc, canon, SITE + "/assets/img/og-gta-master.jpg", rel, schema)
+    h = h.replace('<meta property="og:type" content="website">', '<meta property="og:type" content="article">')
+    body = f"""<main id="main"><section class="vhero bgpar">{bgimg("costa-urbana-pastel", rel=rel, eager=True)}<span class="bgpar__veil bgpar__veil--vhero" aria-hidden="true"></span>
+<nav class="crumbs" aria-label="Migas de pan"><ol><li><a href="{rel}">Inicio</a></li><li aria-current="page">Guía de GTA 6</li></ol></nav>
+<span class="eyebrow px">Guía completa · actualizada el 18 nov 2026</span><h1>GTA 6: todo lo que sabemos</h1>
+<p class="lead">Fecha y hora de lanzamiento, precio, plataformas, cuánto ocupa, rendimiento, duración, mapa, personajes, música y trucos de Grand Theft Auto VI. Solo datos confirmados, con su fuente.</p>
+<div class="chips" style="margin-top:1.4rem">{chips}</div></section>
+<div class="post__wrap guia">
+<div class="table"><table class="ficha"><caption>Ficha de GTA 6</caption><tbody>{tabla}</tbody></table></div>
+<div class="post__body">
+<h2 id="fecha">Fecha y hora de lanzamiento de GTA 6</h2>
+<p>Grand Theft Auto VI sale el <strong>jueves 19 de noviembre de 2026</strong>. Llega tras dos retrasos: primero estaba previsto para otoño de 2025 y después para el 26 de mayo de 2026. El juego se desbloquea a medianoche, hora local de cada país. En España es a las <strong>00:00 del 19 de noviembre</strong> y en Nueva Zelanda ya se juega desde las 12:00 del día 18, hora peninsular. Tienes todas las horas por país en {pl("gta-6-hora-lanzamiento-espana-nueva-zelanda", "nuestra noticia sobre la hora de lanzamiento")}.</p>
+<h2 id="precio">Precio y ediciones de GTA 6</h2>
+<p>Rockstar vende dos ediciones. En España, la <strong>estándar cuesta 79,99 €</strong> y la <strong>Ultimate Edition, 99,99 €</strong>, según la guía de reserva de Vandal. En Estados Unidos los precios son 79,99 y 99,99 dólares. Las reservas abrieron el 25 de junio de 2026.</p>
+<p>La edición física no incluye disco, sino un código de descarga. Te lo contamos en {vl("caja-vacia", "nuestro vídeo sobre la caja sin disco")}.</p>
+<h2 id="plataformas">¿GTA 6 sale en PS5, Xbox y PC?</h2>
+<p>GTA 6 sale en <strong>PlayStation 5, PS5 Pro y Xbox Series X|S</strong>. No hay versión de PC en el lanzamiento ni fecha anunciada: el consejero delegado de Take-Two, Strauss Zelnick, explicó en mayo que el público principal de la saga está en consola. Con GTA V, la versión de PC llegó un año y medio después que la de consola.</p>
+<h2 id="tamano">Cuánto ocupa GTA 6</h2>
+<p>Rockstar ha confirmado que GTA 6 necesita <strong>hasta 212 GB</strong>, según la consola. En una Xbox Series S de 512 GB cabe, pero ocupa más de la mitad del disco. Si tienes PS5, recuerda instalar la actualización del sistema que Sony ha publicado para el lanzamiento. Lo explicamos en {pl("gta-6-212-gb-precarga-espacio", "cómo hacer sitio para GTA 6")} y en {pl("gta-6-actualizacion-ps5-obligatoria", "la actualización obligatoria de PS5")}.</p>
+<h2 id="rendimiento">Fps y resolución de GTA 6</h2>
+<p>GTA 6 funciona a <strong>30 fps en todas las consolas</strong>, incluida PS5 Pro, sin modo rendimiento en el lanzamiento. Según un informe de Wccftech, la base es 1440p en PS5, PS5 Pro y Xbox Series X y 720p en Series S. Tienes la tabla completa en {pl("gta-6-30-fps-resolucion-consolas", "30 fps en todas las consolas")}.</p>
+<h2 id="notas">Notas de GTA 6: 99 en Metacritic</h2>
+<p>Las reseñas se publicaron el 18 de noviembre. GTA 6 marcaba un <strong>99 en Metacritic con 146 críticas</strong> y un 99 en OpenCritic, con dieces en IGN, GameSpot y Game Informer. Lo resumimos en {pl("gta-6-resenas-metacritic-99", "las reseñas de GTA 6")}.</p>
+<h2 id="duracion">Cuánto dura GTA 6</h2>
+<p>Rob Nelson, de Rockstar North, tardó <strong>unas 80 horas</strong> en terminar la historia con algunos objetivos opcionales. Completarlo todo lleva bastante más, y el juego no se acaba con los créditos. Lo explicamos en {pl("gta-6-cuanto-dura-80-horas", "cuánto dura GTA 6")}.</p>
+<h2 id="historia">Historia y personajes de GTA 6</h2>
+<p>Los protagonistas son {vl("jason-duval", "Jason Duval")}, un exmilitar que acaba trabajando para traficantes en los Cayos, y {vl("gta-6-lucia", "Lucia Caminos")}, recién salida de la Penitenciaría de Leonida. Es la primera vez que un GTA principal tiene protagonista femenina. El reparto confirmado incluye a {pjs}. Tienes sus fichas en la página de <a href="{rel}personajes/">personajes de GTA 6</a> y la trama de Megamundo en {pl("gta-6-megamundo-andres-de-leon-petra-navarro", "quién es quién en Megamundo")}.</p>
+<h2 id="mapa">El mapa de GTA 6: Leonida y Vice City</h2>
+<p>GTA 6 transcurre en <strong>Leonida</strong>, un estado ficticio inspirado en Florida. Su gran ciudad es Vice City, inspirada en Miami, que según Rob Nelson es el <strong>doble de grande que Los Santos</strong> de GTA V. Alrededor hay zonas como los Cayos, los pantanos de Grassrivers, Port Gellhorn, Ambrosia y Mount Kalaga. Míralo en {vl("mapa-leonida", "las 6 regiones de Leonida")}, {vl("grassrivers", "los pantanos de Grassrivers")} y {vl("vice-city-dia-noche", "Vice City de día y de noche")}.</p>
+<h2 id="musica">Música y radios de GTA 6</h2>
+<p>La banda sonora original es del dúo francés <strong>Justice</strong>, que estrenó «Flower in a Hurricane» con el tráiler de lanzamiento. Entre las emisoras destacan {vl("cocoteo-fm", "Cocoteo FM, la radio latina con Bad Bunny")} y {vl("por-que-afrobank", "AfroBank FM, la de música africana")}, y por primera vez la radio y los podcasts te siguen también a pie. Más en {pl("gta-6-banda-sonora-justice", "la banda sonora de Justice")}.</p>
+<h2 id="trucos">Trucos de GTA 6</h2>
+<p>Rockstar todavía no ha publicado la lista oficial de trucos de GTA 6. Cuidado con las webs que ya dicen tenerla: hasta el lanzamiento, cualquier lista es inventada. Mientras tanto, repasa {vl("35-trucos", "los 35 trucos de GTA V que podrían volver")}. Publicaremos los trucos de GTA 6 en el <a href="{rel}blog/">blog</a> en cuanto estén comprobados.</p>
+<h2 id="online">¿Y GTA Online?</h2>
+<p>Rockstar no ha detallado el modo online de GTA 6. Take-Two ha confirmado que seguirá actualizando GTA Online después del lanzamiento.</p>
+</div>
+<section class="faq guia__faq" id="faq" aria-labelledby="t-gfaq"><h2 id="t-gfaq" class="h2" style="font-size:clamp(2rem,1.4rem + 2vw,3rem)">Preguntas frecuentes sobre GTA 6</h2>{faq_html}</section>
+<aside class="sources" aria-label="Fuentes"><h2>Fuentes</h2><ul>{src}</ul><p>Guía de fans, no oficial. La actualizamos cuando Rockstar confirma algo nuevo.</p></aside>
+<p><a class="btn btn--yt" href="{SUB}" target="_blank" rel="noopener">{YT_ICON}<span>Más GTA 6 en YouTube</span></a></p>
+</div></main>
+"""
+    d = os.path.join(OUT, "gta-6"); os.makedirs(d, exist_ok=True)
+    open(os.path.join(d, "index.html"), "w").write(h + body + footer(rel))
+
 def build_privacidad():
     rel = "../"; canon = SITE + "/privacidad/"
     title = "Política de privacidad y cookies | GTA MASTER"
@@ -658,7 +784,7 @@ def build_index():
 
 def build_meta():
     today = datetime.now(MAD).strftime("%Y-%m-%d")
-    urls = [(SITE + "/", today, "daily", "1.0"), (SITE + "/videos/", today, "daily", "0.9"), (SITE + "/blog/", today, "daily", "0.9"), (SITE + "/personajes/", today, "weekly", "0.9")]
+    urls = [(SITE + "/", today, "daily", "1.0"), (SITE + "/videos/", today, "daily", "0.9"), (SITE + "/blog/", today, "daily", "0.9"), (SITE + "/personajes/", today, "weekly", "0.9"), (SITE + "/gta-6/", today, "daily", "1.0")]
     urls += [(purl(p), p.get("updated", p["date"])[:10], "weekly", "0.8") for p in POSTS]
     vids = []
     for v in V:
@@ -679,6 +805,7 @@ def build_meta():
     llms = [f"# GTA MASTER", "", "> Web y canal de YouTube en español sobre Grand Theft Auto VI (GTA 6): detalles que no viste, personajes, mapa de Leonida, Vice City y curiosidades, analizados con material oficial de Rockstar Games. Web de fans, no oficial.", "",
             f"- Canal de YouTube: {CHANNEL}", f"- Lanzamiento de GTA 6: 19 de noviembre de 2026, PS5 y Xbox Series X|S", "", "## Vídeos"]
     llms += [f"- [{v['h1']}]({vurl(v)}): {v['desc']}" for v in V]
+    llms += ["", "## Guía de GTA 6", f"- [GTA 6: todo lo que sabemos]({SITE}/gta-6/): fecha y hora de lanzamiento, precio y ediciones, PC, tamaño, fps, duración, mapa, personajes, música y trucos."]
     llms += ["", "## Personajes de GTA 6", f"- [Todos los personajes]({SITE}/personajes/): " + ", ".join(c["n"] for c in CAST)]
     llms += ["", "## Noticias (blog)"] + [f"- [{p['title']}]({purl(p)}): {p['desc']}" for p in POSTS[:20]]
     llms += ["", "## Páginas", f"- [Inicio]({SITE}/): resumen del canal, personajes, regiones de Leonida y preguntas frecuentes", f"- [Todos los vídeos]({SITE}/videos/)"]
@@ -735,5 +862,5 @@ if __name__ == "__main__":
     validar()
     build_home()
     for v in V: build_video(v)
-    build_index(); build_posts(); build_blog_index(); build_personajes(); build_privacidad(); build_meta()
+    build_index(); build_posts(); build_blog_index(); build_personajes(); build_privacidad(); build_guia(); build_meta()
     print("OK:", len(V), "vídeos")

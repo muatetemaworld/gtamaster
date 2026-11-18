@@ -41,6 +41,19 @@ def clean_title(t):
     return t
 
 
+def seo_title(h1):
+    """Título para Google: con «GTA 6» delante, sin «|» ni «…», hasta 60 caracteres."""
+    t = re.sub(r"\s*\|\s*", ": ", h1).strip()
+    t = re.sub(r"(:\s*){2,}", ": ", t)
+    # palabras enteras en mayúsculas (salvo siglas cortas) a minúsculas
+    t = re.sub(r"\b([A-ZÁÉÍÓÚÑ]{4,})\b", lambda m: m.group(1).capitalize() if m.start() == 0 else m.group(1).lower(), t)
+    if not re.search(r"\bgta\s*(6|vi)\b", t, re.I): t = "GTA 6: " + t
+    if len(t) <= 60: return t
+    for sep in (": ", "? ", ", "):
+        i = t.rfind(sep, 20, 60)
+        if i > 0: return t[: i + (1 if sep.startswith("?") else 0)].rstrip(" :,")
+    return t[:60].rsplit(" ", 1)[0].rstrip(" :,")
+
 def slugify(t):
     t = unicodedata.normalize("NFKD", t.lower()).encode("ascii", "ignore").decode()
     t = re.sub(r"[^a-z0-9]+", "-", t).strip("-")
@@ -139,7 +152,7 @@ def main():
         n = 2
         while slug in slugs: slug = f"{base}-{n}"; n += 1
         slugs.add(slug)
-        title_seo = h1 if len(h1) <= 60 else h1[:57].rsplit(" ", 1)[0] + "…"
+        title_seo = seo_title(h1)
         cat = "Shorts" if short else category(raw_title + " " + desc[:300])
         v = {
             "id": vid, "up": e.find("a:published", NS).text, "len": duration(vid), "cat": cat, "slug": slug,
