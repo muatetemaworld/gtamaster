@@ -2,7 +2,7 @@
 """Genera la web estática de GTA MASTER (home, páginas de vídeo, sitemap, robots, llms.txt).
 Cambia SITE por tu dominio definitivo y vuelve a ejecutar: python3 build.py
 """
-import json, os, random, html
+import json, os, random, html, re
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
@@ -101,7 +101,7 @@ def head(title, desc, canon, img, rel, schema, extra=""):
 <header class="nav">
   <a class="nav__brand" href="{rel or './'}" aria-label="GTA MASTER, inicio"><img src="{rel}assets/img/icon-192.png" width="46" height="46" alt=""><span>GTA MASTER</span></a>
   <nav aria-label="Principal"><ul class="nav__links">
-    <li><a href="{rel}#videos">Vídeos</a></li><li><a href="{rel}#personajes">Personajes</a></li><li><a href="{rel}#leonida">Leonida</a></li><li><a href="{rel}#faq">Preguntas</a></li>
+    <li><a href="{rel}#videos">Vídeos</a></li><li><a href="{rel}#personajes">Personajes</a></li><li><a href="{rel}#leonida">Leonida</a></li><li><a href="{rel}blog/">Blog</a></li><li><a href="{rel}#faq">Preguntas</a></li>
   </ul></nav>
   <a class="btn btn--yt" href="{SUB}" target="_blank" rel="noopener">{YT_ICON}<span>Suscríbete</span></a>
 </header>
@@ -115,7 +115,7 @@ def footer(rel):
     <div><h2>GTA MASTER</h2><p>GTA 6 en español: detalles que no viste, personajes, mapa de Leonida y curiosidades, con material oficial de Rockstar Games.</p>
     <p><a class="btn btn--yt" href="{SUB}" target="_blank" rel="noopener">{YT_ICON}<span>Canal de YouTube</span></a></p></div>
     <div><h2>Últimos vídeos</h2><ul>{vids}</ul></div>
-    <div><h2>Más análisis</h2><ul>{vids2}<li><a href="{rel}videos/">Todos los vídeos</a></li></ul></div>
+    <div><h2>Más análisis</h2><ul>{vids2}<li><a href="{rel}videos/">Todos los vídeos</a></li><li><a href="{rel}blog/">Blog de noticias</a></li></ul></div>
   </div>
   <small>© <span data-year>2026</span> GTA MASTER · Web de fans, no oficial. Grand Theft Auto, GTA y Grand Theft Auto VI son marcas de Take-Two Interactive. Esta web no está afiliada a Rockstar Games ni a Take-Two. Las imágenes de los vídeos son miniaturas del canal GTA MASTER.</small>
 </footer>
@@ -269,6 +269,7 @@ def build_home():
   </div>
 </section>
 
+{home_news()}
 <div class="stats" role="list">
   <div class="stat" role="listitem"><b data-count="{len(V)}">{len(V)}</b><span>Análisis publicados</span></div>
   <div class="stat" role="listitem"><b data-count="6">6</b><span>Regiones de Leonida</span></div>
@@ -365,6 +366,137 @@ def build_video(v):
     d = os.path.join(OUT, "videos", v["slug"]); os.makedirs(d, exist_ok=True)
     open(os.path.join(d, "index.html"), "w").write(h + body + footer(rel))
 
+# ---------- BLOG ----------
+POSTS_PATH = os.path.join(OUT, "data", "posts.json")
+POSTS = json.load(open(POSTS_PATH, encoding="utf-8")) if os.path.exists(POSTS_PATH) else []
+POSTS.sort(key=lambda p: p["date"], reverse=True)
+
+def purl(p): return f"{SITE}/blog/{p['slug']}/"
+def pfecha(p):
+    dt = datetime.fromisoformat(p["date"]).astimezone(MAD)
+    return f"{dt.day} {MESES[dt.month-1]} {dt.year}"
+def read_min(p): return max(2, round(len(re.sub(r"<[^>]+>", " ", p["body"]).split()) / 200))
+
+def _inline(s, rel):
+    s = esc(s)
+    s = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", s)
+    def link(m):
+        t, u = m.group(1), m.group(2).replace("&amp;", "&")
+        if u.startswith("/"):
+            return f'<a href="{rel}{u.lstrip("/")}">{t}</a>'
+        return f'<a href="{esc(u)}" target="_blank" rel="noopener">{t}</a>'
+    return re.sub(r"\[([^\]]+)\]\(([^)\s]+)\)", link, s)
+
+def yt_embed(vid, title):
+    return (f'<figure class="yt"><div class="yt__frame"><iframe src="https://www.youtube-nocookie.com/embed/{vid}?rel=0" '
+            f'title="{esc(title)}" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" '
+            f'allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>'
+            f'<figcaption>{esc(title)} · <a href="https://www.youtube.com/watch?v={vid}" target="_blank" rel="noopener">Ver en YouTube</a></figcaption></figure>')
+
+def md(text, rel):
+    out = []
+    for block in [b.strip() for b in re.split(r"\n\s*\n", text) if b.strip()]:
+        m = re.match(r"^\{\{youtube:([\w-]{11})\s*\|\s*(.+?)\}\}$", block)
+        if m: out.append(yt_embed(m.group(1), m.group(2))); continue
+        if block.startswith("### "): out.append(f"<h3>{_inline(block[4:], rel)}</h3>"); continue
+        if block.startswith("## "): out.append(f"<h2>{_inline(block[3:], rel)}</h2>"); continue
+        lines = block.split("\n")
+        if all(l.startswith("- ") for l in lines):
+            out.append("<ul>" + "".join(f"<li>{_inline(l[2:], rel)}</li>" for l in lines) + "</ul>"); continue
+        if all(l.strip().startswith("|") for l in lines) and len(lines) >= 3:
+            rows = [[c.strip() for c in l.strip().strip("|").split("|")] for l in lines if not re.match(r"^\|?\s*:?-{2,}", l.strip())]
+            th = "".join(f"<th>{_inline(c, rel)}</th>" for c in rows[0])
+            tb = "".join("<tr>" + "".join(f"<td>{_inline(c, rel)}</td>" for c in r) + "</tr>" for r in rows[1:])
+            out.append(f'<div class="table"><table><thead><tr>{th}</tr></thead><tbody>{tb}</tbody></table></div>'); continue
+        if block.startswith("> "): out.append(f"<blockquote>{_inline(block[2:], rel)}</blockquote>"); continue
+        out.append(f"<p>{_inline(' '.join(lines), rel)}</p>")
+    return "\n".join(out)
+
+def pcard(p, rel):
+    return (f'<a class="pcard" href="{rel}blog/{p["slug"]}/"><div class="pcard__img">'
+            f'<img src="{rel}assets/blog/{p["slug"]}-640.webp" srcset="{rel}assets/blog/{p["slug"]}-640.webp 640w, {rel}assets/blog/{p["slug"]}.webp 1280w" sizes="(max-width:760px) 92vw, 420px" width="1280" height="720" alt="{esc(p.get("cover_alt") or p["title"])}" loading="lazy" decoding="async"></div>'
+            f'<div class="pcard__body"><span class="tag px">{esc(p["cat"])}</span><h3>{esc(p["title"])}</h3><p>{esc(p["desc"])}</p>'
+            f'<time datetime="{p["date"]}">{pfecha(p)}</time></div></a>')
+
+def build_posts():
+    for i, p in enumerate(POSTS):
+        rel = "../../"; canon = purl(p); img = f"{SITE}/assets/blog/{p['slug']}.jpg"
+        title = p.get("seo_title") or p["title"]
+        if len(title) + 15 <= 62: title += " | GTA MASTER"
+        schema = {"@context": "https://schema.org", "@graph": [ORG,
+            {"@type": "NewsArticle", "@id": canon + "#article", "headline": p["title"][:110], "description": p["desc"],
+             "image": [img], "datePublished": p["date"], "dateModified": p.get("updated", p["date"]), "inLanguage": "es",
+             "articleSection": p["cat"], "keywords": ", ".join(p.get("tags", [])),
+             "author": {"@type": "Organization", "name": "Redacción GTA MASTER", "url": SITE + "/"},
+             "publisher": {"@id": SITE + "/#org"}, "mainEntityOfPage": canon,
+             "citation": [s["url"] for s in p.get("sources", [])],
+             "about": {"@type": "VideoGame", "name": "Grand Theft Auto VI"}},
+            {"@type": "BreadcrumbList", "itemListElement": [
+                {"@type": "ListItem", "position": 1, "name": "Inicio", "item": SITE + "/"},
+                {"@type": "ListItem", "position": 2, "name": "Blog", "item": SITE + "/blog/"},
+                {"@type": "ListItem", "position": 3, "name": p["title"], "item": canon}]}]}
+        h = head(title, p["desc"], canon, img, rel, schema,
+                 f'<meta property="article:published_time" content="{p["date"]}">\n<link rel="alternate" type="application/rss+xml" title="Blog GTA MASTER" href="{SITE}/blog/feed.xml">\n')
+        h = h.replace('<meta property="og:type" content="website">', '<meta property="og:type" content="article">')
+        src = "".join(f'<li><a href="{esc(s["url"])}" target="_blank" rel="noopener">{esc(s["name"])}</a>{(" · " + esc(s["note"])) if s.get("note") else ""}</li>' for s in p.get("sources", []))
+        others = [x for x in POSTS if x["slug"] != p["slug"]][:3]
+        more = f'<section class="wrap post__more"><h2 class="h2" style="font-size:clamp(2rem,1.4rem + 2.4vw,3.4rem)">Más noticias</h2><div class="bgrid">{"".join(pcard(x, rel) for x in others)}</div></section>' if others else ""
+        body = f'''<main id="main">
+<article class="post">
+  <header class="vhero bgpar">{bgimg(p.get("fondo", "horizonte-neon-noche"), rel=rel, eager=True)}<span class="bgpar__veil bgpar__veil--vhero" aria-hidden="true"></span>
+    <nav class="crumbs" aria-label="Migas de pan"><ol><li><a href="{rel}">Inicio</a></li><li><a href="{rel}blog/">Blog</a></li><li aria-current="page">{esc(p["cat"])}</li></ol></nav>
+    <span class="tag px">{esc(p["cat"])}</span>
+    <h1>{esc(p["title"])}</h1>
+    <div class="meta-row"><time datetime="{p["date"]}">{pfecha(p)}</time><span>Redacción GTA MASTER</span><span>{read_min(p)} min de lectura</span></div>
+  </header>
+  <div class="post__wrap">
+    <figure class="post__cover"><img src="{rel}assets/blog/{p["slug"]}.webp" width="1280" height="720" alt="{esc(p.get("cover_alt") or p["title"])}" fetchpriority="high"><figcaption>Portada: GTA MASTER</figcaption></figure>
+    <p class="post__lead">{_inline(p["desc"], rel)}</p>
+    <div class="post__body">{md(p["body"], rel)}</div>
+    <aside class="sources" aria-label="Fuentes"><h2>Fuentes</h2><ul>{src}</ul>
+      <p>Las noticias de GTA MASTER se basan en las fuentes citadas. Si algo es un rumor, lo indicamos.</p></aside>
+    <p><a class="btn btn--yt" href="{SUB}" target="_blank" rel="noopener">{YT_ICON}<span>Más GTA 6 en YouTube</span></a></p>
+  </div>
+</article>
+{more}
+</main>
+'''
+        d = os.path.join(OUT, "blog", p["slug"]); os.makedirs(d, exist_ok=True)
+        open(os.path.join(d, "index.html"), "w").write(h + body + footer(rel))
+
+def build_blog_index():
+    rel = "../"; canon = SITE + "/blog/"
+    title = "Noticias de GTA 6 en español: blog diario | GTA MASTER"
+    desc = "Noticias de GTA 6 cada día: lanzamiento, personajes, trucos y curiosidades de Grand Theft Auto VI, con fuentes y vídeos. Blog de GTA MASTER."
+    schema = {"@context": "https://schema.org", "@graph": [ORG,
+        {"@type": "CollectionPage", "@id": canon, "url": canon, "name": title, "description": desc, "inLanguage": "es", "isPartOf": {"@id": SITE + "/#web"}},
+        {"@type": "ItemList", "itemListElement": [{"@type": "ListItem", "position": i + 1, "url": purl(p)} for i, p in enumerate(POSTS)]}]}
+    h = head(title, desc, canon, SITE + "/assets/img/og-gta-master.jpg", rel, schema,
+             f'<link rel="alternate" type="application/rss+xml" title="Blog GTA MASTER" href="{SITE}/blog/feed.xml">\n')
+    cards = "".join(pcard(p, rel) for p in POSTS) or '<p class="lead">Pronto, las primeras noticias.</p>'
+    body = f'''<main id="main"><section class="vhero bgpar">{bgimg("horizonte-neon-noche", rel=rel, eager=True)}<span class="bgpar__veil bgpar__veil--vhero" aria-hidden="true"></span>
+<nav class="crumbs" aria-label="Migas de pan"><ol><li><a href="{rel}">Inicio</a></li><li aria-current="page">Blog</li></ol></nav>
+<span class="eyebrow px">Cada día</span><h1>Noticias de GTA 6</h1><p class="lead">Lanzamiento, personajes, trucos y curiosidades de Grand Theft Auto VI. Siempre con la fuente y, cuando lo hay, con el vídeo.</p></section>
+<div class="wrap" style="padding-bottom:5rem"><div class="bgrid">{cards}</div></div></main>
+'''
+    d = os.path.join(OUT, "blog"); os.makedirs(d, exist_ok=True)
+    open(os.path.join(d, "index.html"), "w").write(h + body + footer(rel))
+    # RSS
+    items = "".join(f'<item><title>{esc(p["title"])}</title><link>{purl(p)}</link><guid>{purl(p)}</guid>'
+                    f'<pubDate>{datetime.fromisoformat(p["date"]).strftime("%a, %d %b %Y %H:%M:%S %z")}</pubDate>'
+                    f'<description>{esc(p["desc"])}</description><enclosure url="{SITE}/assets/blog/{p["slug"]}.jpg" type="image/jpeg" length="0"/></item>' for p in POSTS[:30])
+    open(os.path.join(d, "feed.xml"), "w").write(f'<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel><title>GTA MASTER · Noticias de GTA 6</title>'
+        f'<link>{SITE}/blog/</link><description>{esc(desc)}</description><language>es</language>{items}</channel></rss>')
+
+def home_news(rel=""):
+    if not POSTS: return ""
+    return f'''<section class="news sec" id="noticias" aria-labelledby="t-news">
+  <div class="wrap"><div class="videos__head"><div><span class="eyebrow px reveal">Blog diario</span><h2 class="h2 reveal" id="t-news">Lo último de <span class="grad-text">GTA 6</span></h2></div>
+  <a class="pill pill--ghost reveal" href="{rel}blog/"><span>Todas las noticias</span>{ARROW}</a></div>
+  <div class="bgrid" style="margin-top:2.4rem">{"".join(pcard(p, rel) for p in POSTS[:3])}</div></div>
+</section>
+'''
+
 def build_index():
     rel = "../"; canon = SITE + "/videos/"
     title = "Vídeos de GTA 6 en español | GTA MASTER"
@@ -387,7 +519,8 @@ def build_index():
 
 def build_meta():
     today = datetime.now(MAD).strftime("%Y-%m-%d")
-    urls = [(SITE + "/", today, "daily", "1.0"), (SITE + "/videos/", today, "daily", "0.9")]
+    urls = [(SITE + "/", today, "daily", "1.0"), (SITE + "/videos/", today, "daily", "0.9"), (SITE + "/blog/", today, "daily", "0.9")]
+    urls += [(purl(p), p.get("updated", p["date"])[:10], "weekly", "0.8") for p in POSTS]
     vids = []
     for v in V:
         urls.append((vurl(v), v["up"][:10], "weekly", "0.8"))
@@ -407,6 +540,7 @@ def build_meta():
     llms = [f"# GTA MASTER", "", "> Web y canal de YouTube en español sobre Grand Theft Auto VI (GTA 6): detalles que no viste, personajes, mapa de Leonida, Vice City y curiosidades, analizados con material oficial de Rockstar Games. Web de fans, no oficial.", "",
             f"- Canal de YouTube: {CHANNEL}", f"- Lanzamiento de GTA 6: 19 de noviembre de 2026, PS5 y Xbox Series X|S", "", "## Vídeos"]
     llms += [f"- [{v['h1']}]({vurl(v)}): {v['desc']}" for v in V]
+    llms += ["", "## Noticias (blog)"] + [f"- [{p['title']}]({purl(p)}): {p['desc']}" for p in POSTS[:20]]
     llms += ["", "## Páginas", f"- [Inicio]({SITE}/): resumen del canal, personajes, regiones de Leonida y preguntas frecuentes", f"- [Todos los vídeos]({SITE}/videos/)"]
     open(os.path.join(OUT, "llms.txt"), "w").write("\n".join(llms) + "\n")
     open(os.path.join(OUT, "site.webmanifest"), "w").write(json.dumps({"name": "GTA MASTER · GTA 6 en español", "short_name": "GTA MASTER", "lang": "es", "start_url": "/", "display": "standalone",
@@ -417,5 +551,5 @@ def build_meta():
 if __name__ == "__main__":
     build_home()
     for v in V: build_video(v)
-    build_index(); build_meta()
+    build_index(); build_posts(); build_blog_index(); build_meta()
     print("OK:", len(V), "vídeos")
