@@ -39,11 +39,13 @@ def main():
     ap.add_argument("--slug", required=True)
     ap.add_argument("--nombre", required=True)
     ap.add_argument("--lema", default="")
-    ap.add_argument("--fondo", required=True)
+    ap.add_argument("--fondo", default="horizonte-neon-noche")
+    ap.add_argument("--imagen", help="ilustración propia (por ejemplo, generada con IA)")
     ap.add_argument("--fx", type=float, default=0.55)
     a = ap.parse_args()
 
-    base = cover_crop(Image.open(os.path.join(ROOT, "assets", "bg", f"{a.fondo}-1600.webp")).convert("RGB"), W, H, fx=a.fx).convert("RGBA")
+    src = a.imagen or os.path.join(ROOT, "assets", "bg", f"{a.fondo}-1600.webp")
+    base = cover_crop(Image.open(src).convert("RGB"), W, H, fx=a.fx).convert("RGBA")
     # Tinte violeta-rosa de las miniaturas y velado a la izquierda
     tint = Image.new("RGBA", (W, H), (120, 40, 150, 70)); base.alpha_composite(tint)
     shade = Image.new("RGBA", (W, H), (0, 0, 0, 0)); d = ImageDraw.Draw(shade)

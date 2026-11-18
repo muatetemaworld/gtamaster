@@ -533,7 +533,7 @@ def char_section(c, k, rel, full=False):
     """Bloque de personaje con el mismo diseño en la portada y en /personajes/."""
     v = BY.get(c["v"]) if c["v"] else None
     if v:
-        href = f'{rel}videos/{v["slug"]}/'; media = img(v, sizes="(max-width:820px) 92vw, 46vw").replace("{rel}", rel); cta = "Ver el análisis"
+        href = f'{rel}videos/{v["slug"]}/'; media = char_img(c, rel); cta = "Ver el análisis"
     else:
         href = f'{rel}personajes/#{c["slug"]}'; media = char_img(c, rel); cta = "Ver la ficha"
     if full and not v:
@@ -555,7 +555,7 @@ def build_personajes():
          "about": {"@type": "VideoGame", "name": "Grand Theft Auto VI"}, "citation": [u for _, u in CAST_SOURCES]},
         {"@type": "ItemList", "name": "Personajes de GTA 6", "numberOfItems": len(CAST), "itemListElement": [
             {"@type": "ListItem", "position": i + 1, "name": c["n"], "url": f"{canon}#{c['slug']}",
-             "image": f"{SITE}/assets/personajes/{c['slug']}.jpg" if not c["v"] else f"{SITE}/assets/thumbs/{c['v']}.jpg"} for i, c in enumerate(CAST)]},
+             "image": f"{SITE}/assets/personajes/{c['slug']}.jpg"} for i, c in enumerate(CAST)]},
         {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Inicio", "item": SITE + "/"}, {"@type": "ListItem", "position": 2, "name": "Personajes de GTA 6", "item": canon}]}]}
     h = head(title, desc, canon, SITE + "/assets/personajes/raul-bautista.jpg", rel, schema)
     idx = "".join(f'<a class="chip" href="#{c["slug"]}">{esc(c["n"])}</a>' for c in CAST)
@@ -567,7 +567,7 @@ def build_personajes():
 <div class="chips" style="margin-top:1.6rem">{idx}</div></section>
 <section class="cast">{secs}</section>
 <div class="wrap" style="padding-block:3rem 5rem"><aside class="sources"><h2>Fuentes</h2><ul>{src}</ul>
-<p>Las portadas de los personajes sin vídeo son diseños de GTA MASTER con fondos propios; no reproducen arte oficial de Rockstar.</p></aside></div></main>
+<p>Las portadas de los personajes son ilustraciones originales de GTA MASTER, creadas con IA a partir de escenas de su mundo. No reproducen arte oficial de Rockstar ni dibujan a los personajes.</p></aside></div></main>
 '''
     d = os.path.join(OUT, "personajes"); os.makedirs(d, exist_ok=True)
     open(os.path.join(d, "index.html"), "w").write(h + body + footer(rel))
