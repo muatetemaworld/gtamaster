@@ -1,10 +1,12 @@
 name: Actualizar vídeos y publicar la web
 
+# La cuenta de GitHub tiene las Actions bloqueadas por un problema de facturación.
+# Mientras tanto, una tarea programada de Claude busca los vídeos nuevos y la web
+# se publica sola desde la rama main (Pages > Deploy from a branch).
+# Cuando se resuelva la facturación, se pueden reactivar estas líneas:
+#   schedule:
+#     - cron: "23 * * * *"
 on:
-  push:
-    branches: [main]
-  schedule:
-    - cron: "23 * * * *"   # cada hora: busca vídeos nuevos en el canal
   workflow_dispatch:
 
 permissions:
