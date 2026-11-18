@@ -31,7 +31,7 @@
   });
 
   /* Filtro de vídeos por tema */
-  var chips = d.querySelectorAll('.chip');
+  var chips = d.querySelectorAll('.chip[data-filter]');
   chips.forEach(function (c) {
     c.addEventListener('click', function () {
       var f = c.getAttribute('data-filter');

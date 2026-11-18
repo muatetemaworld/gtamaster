@@ -48,10 +48,41 @@ REGIONS = [
 ]
 
 CAST = [
- ("Jason Duval", "Protagonista. Exmilitar que acaba trabajando para traficantes en Leonida.", "BdIQoWrnTQc"),
- ("Lucia", "Protagonista. Su pasado incluye una etapa en prisión y una relación clave con Jason.", "q9amoxM3teA"),
- ("Cal Hampton", "Amigo de Jason en los Cayos y socio de Brian. Desconfía de todo.", "INVN9F4vSH8"),
+    {"n": "Jason Duval", "big": "Jason", "slug": "jason-duval", "rol": "Protagonista", "v": "BdIQoWrnTQc", "bg": "boulevard-art-deco",
+     "t": "Protagonista. Exmilitar que acaba de nuevo en el mundo del crimen, trabajando para traficantes en los Cayos de Leonida.",
+     "bio": "Creció rodeado de estafadores y delincuentes, pasó por el ejército y, al volver, acabó haciendo trabajos para los traficantes de los Cayos. Allí conoce a Lucia, y su relación es el eje de la historia."},
+    {"n": "Lucia Caminos", "big": "Lucia", "slug": "lucia-caminos", "rol": "Protagonista", "v": "q9amoxM3teA", "bg": "bahia-urbana",
+     "t": "Protagonista. Dispuesta a cambiar de vida después de pasar por la Penitenciaría de Leonida.",
+     "bio": "Su padre le enseñó a pelear. Tras su paso por la Penitenciaría de Leonida decidió tomar solo decisiones inteligentes y busca la vida cómoda con la que soñaba su madre en Liberty City."},
+    {"n": "Raul Bautista", "big": "Raul", "slug": "raul-bautista", "rol": "Secundario", "v": None, "bg": "costa-urbana-pastel", "lema": "Atracador de bancos",
+     "t": "Atracador de bancos veterano que siempre busca un golpe mayor.",
+     "bio": "Confía en la experiencia, el carisma y la astucia. Busca socios con talento dispuestos a asumir trabajos de mucho riesgo a cambio de un gran botín."},
+    {"n": "Brian Heder", "big": "Brian", "slug": "brian-heder", "rol": "Secundario", "v": None, "bg": "everglades-aerodeslizador", "lema": "Contrabandista retirado",
+     "t": "Contrabandista de la vieja escuela de los Cayos que todavía conserva sus contactos.",
+     "bio": "Parece un jubilado de playa, pero sigue moviendo mercancía desde su astillero junto a su tercera esposa, Lori, y deja que otros hagan el trabajo sucio. Jason trabaja para él."},
+    {"n": "Boobie Ike", "big": "Boobie", "slug": "boobie-ike", "rol": "Secundario", "v": "j3dwEDoxv4k", "bg": "club-art-deco",
+     "t": "Leyenda local de Vice City: de la calle a empresario de éxito.",
+     "bio": "Convirtió su pasado en la calle en un imperio de negocios legales: inmobiliarias, un club de striptease y el estudio de grabación del sello Only Raw Records."},
+    {"n": "Cal Hampton", "big": "Cal", "slug": "cal-hampton", "rol": "Secundario", "v": "INVN9F4vSH8", "bg": "lancha-tropical",
+     "t": "Amigo de Jason y socio de Brian. Un teórico de la conspiración que desconfía de todo.",
+     "bio": "Prefiere quedarse en casa espiando las comunicaciones de la Guardia Costera. Se conforma con la vida tranquila mientras Jason sueña con algo más grande."},
+    {"n": "Dre'Quan Priest", "big": "Dre'Quan", "slug": "drequan-priest", "rol": "Secundario", "v": None, "bg": "horizonte-neon-noche", "lema": "Buscavidas del rap",
+     "t": "Más buscavidas que gánster: quiere triunfar en la música.",
+     "bio": "Vendía en la calle para salir adelante mientras perseguía su carrera musical. Ahora está ligado al sello Only Raw Records, donde ha fichado a Real Dimez."},
+    {"n": "Real Dimez", "big": "Dimez", "slug": "real-dimez", "rol": "Secundario", "v": None, "bg": "atardecer-neon-mar", "lema": "Bae-Luxe y Roxy",
+     "t": "Bae-Luxe y Roxy: de sus comienzos en la calle al éxito en las redes.",
+     "bio": "Amigas desde el instituto, se hicieron un nombre con temas provocadores y mucha promoción en redes. Su primer éxito llegó con el rapero DWNPLY y ahora han fichado por Only Raw Records."},
+    {"n": "Andrés de León", "big": "Andrés", "slug": "andres-de-leon", "rol": "Secundario", "v": None, "bg": "estadio-tropical", "lema": "VIP de Megamundo",
+     "t": "Un VIP de Megamundo que necesita algo más que protección.",
+     "bio": "Socio adinerado de Megamundo. Jason y Lucia son contratados, a través de Valentina, como su escolta en la inauguración de la primera sede de Megamundo en Estados Unidos, donde acaba tomado como rehén."},
+    {"n": "Petra Navarro", "big": "Petra", "slug": "petra-navarro", "rol": "Secundario", "v": None, "bg": "bahia-urbana", "lema": "Directora de Megamundo",
+     "t": "Directora de operaciones de Megamundo, figura clave del mundo empresarial de Vice City.",
+     "bio": "Es la COO de Megamundo. Conoce a Jason y a Lucia a través de Valentina durante la inauguración del edificio de la compañía."},
 ]
+CAST_SOURCES = [("Rockstar Games: personajes de GTA VI", "https://www.rockstargames.com/VI"),
+                ("GTABase: guía de personajes de GTA 6", "https://www.gtabase.com/es/gta-6/personajes/"),
+                ("PC Gamer: GTA 6 characters", "https://www.pcgamer.com/games/action/grand-theft-auto/gta6-characters"),
+                ("Stevivor: GTA 6 characters", "https://stevivor.com/guides/gta-6-characters/")]
 
 # ---------- piezas comunes ----------
 YT_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.6 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg>'
@@ -101,7 +132,7 @@ def head(title, desc, canon, img, rel, schema, extra=""):
 <header class="nav">
   <a class="nav__brand" href="{rel or './'}" aria-label="GTA MASTER, inicio"><img src="{rel}assets/img/icon-192.png" width="46" height="46" alt=""><span>GTA MASTER</span></a>
   <nav aria-label="Principal"><ul class="nav__links">
-    <li><a href="{rel}#videos">Vídeos</a></li><li><a href="{rel}#personajes">Personajes</a></li><li><a href="{rel}#leonida">Leonida</a></li><li><a href="{rel}blog/">Blog</a></li><li><a href="{rel}#faq">Preguntas</a></li>
+    <li><a href="{rel}#videos">Vídeos</a></li><li><a href="{rel}personajes/">Personajes</a></li><li><a href="{rel}#leonida">Leonida</a></li><li><a href="{rel}blog/">Blog</a></li><li><a href="{rel}#faq">Preguntas</a></li>
   </ul></nav>
   <a class="btn btn--yt" href="{SUB}" target="_blank" rel="noopener">{YT_ICON}<span>Suscríbete</span></a>
 </header>
@@ -217,12 +248,7 @@ def build_home():
     grid = "".join(vcard(v, rel) for v in V)
     cats = ["Todos"] + [c for c in ["Personajes", "Leonida", "Mecánicas", "Historia", "Curiosidades", "Análisis", "Shorts"] if any(v["cat"] == c for v in V)]
     chips = "".join(f'<button type="button" class="chip{" is-on" if c == "Todos" else ""}" data-filter="{c}" aria-pressed="{"true" if c == "Todos" else "false"}">{c}</button>' for c in cats)
-    char_bg = {"BdIQoWrnTQc": "boulevard-art-deco", "q9amoxM3teA": "bahia-urbana", "INVN9F4vSH8": "lancha-tropical"}
-    cast = "".join(f'''<article class="char">{bgimg(char_bg[i], cls="char__bg bgpar__img")}<span class="char__veil" aria-hidden="true"></span>
-  <div class="char__inner wrap"><span class="char__name" aria-hidden="true">{esc(n.split()[0])}</span>
-  <div class="char__media"><a href="videos/{BY[i]["slug"]}/">{img(BY[i], sizes="(max-width:820px) 92vw, 46vw").replace("{rel}", "")}</a></div>
-  <div class="char__copy reveal"><span class="eyebrow px">Personaje 0{k+1}</span><h3>{esc(n)}</h3><p>{esc(t)}</p>
-  <a class="pill pill--ghost" href="videos/{BY[i]["slug"]}/"><span>Ver el análisis</span>{ARROW}</a></div></div></article>''' for k, (n, t, i) in enumerate(CAST))
+    cast = "".join(char_section(c, k, "") for k, c in enumerate(CAST))
     regions = "".join(f'<article class="region reveal"><h3>{esc(n)}</h3><p>{esc(t)}</p><a href="videos/{BY[i]["slug"]}/">Vídeo: {esc(l)} →</a></article>' for n, t, i, l in REGIONS)
     faq = "".join(f'<details><summary>{esc(q)}</summary><p>{esc(a)}</p></details>' for q, a in FAQ)
     body = f'''<main id="main">
@@ -283,8 +309,9 @@ def build_home():
 
 <section class="cast sec" id="personajes" aria-labelledby="t-cast">
   <div class="wrap"><span class="eyebrow px reveal">Quién es quién</span><h2 class="h2 reveal" id="t-cast">Personajes de <span class="grad-text">GTA 6</span></h2>
-  <p class="lead reveal">Jason y Lucia llevan la historia, pero Leonida está llena de secundarios. Estos son los que ya hemos analizado.</p></div>
+  <p class="lead reveal">Jason y Lucia llevan la historia, pero Leonida está llena de secundarios. Este es todo el reparto confirmado hasta hoy.</p></div>
   {cast}
+  <div class="wrap" style="text-align:center;padding-top:2rem"><a class="pill" href="personajes/"><span>Todos los personajes, explicados</span>{ARROW}</a></div>
 </section>
 
 <section class="leonida sec bgpar" id="leonida" aria-labelledby="t-leo">
@@ -497,6 +524,54 @@ def home_news(rel=""):
 </section>
 '''
 
+def char_img(c, rel, sizes="(max-width:820px) 92vw, 46vw"):
+    p = f"{rel}assets/personajes/{c['slug']}"
+    return (f'<img src="{p}.webp" srcset="{p}-640.webp 640w, {p}.webp 1280w" sizes="{sizes}" width="1280" height="720" '
+            f'alt="{esc(c["n"])}, personaje de GTA 6: portada de GTA MASTER" loading="lazy" decoding="async">')
+
+def char_section(c, k, rel, full=False):
+    """Bloque de personaje con el mismo diseño en la portada y en /personajes/."""
+    v = BY.get(c["v"]) if c["v"] else None
+    if v:
+        href = f'{rel}videos/{v["slug"]}/'; media = img(v, sizes="(max-width:820px) 92vw, 46vw").replace("{rel}", rel); cta = "Ver el análisis"
+    else:
+        href = f'{rel}personajes/#{c["slug"]}'; media = char_img(c, rel); cta = "Ver la ficha"
+    if full and not v:
+        href = f'{rel}personajes/#{c["slug"]}'
+    text = f'<p>{esc(c["t"])}</p>' + (f'<p>{esc(c["bio"])}</p>' if full else "")
+    btn = (f'<a class="pill pill--ghost" href="{href}"><span>{cta}</span>{ARROW}</a>' if (v or not full) else "")
+    return f'''<article class="char" id="{c["slug"]}">{bgimg(c["bg"], rel=rel, cls="char__bg bgpar__img")}<span class="char__veil" aria-hidden="true"></span>
+  <div class="char__inner wrap"><span class="char__name" aria-hidden="true">{esc(c["big"])}</span>
+  <div class="char__media"><a href="{href}" aria-label="{esc(c["n"])}">{media}</a></div>
+  <div class="char__copy reveal"><span class="eyebrow px">Personaje {k+1:02d} · {c["rol"]}</span><{"h2" if full else "h3"} class="char__h">{esc(c["n"])}</{"h2" if full else "h3"}>{text}
+  {btn}</div></div></article>'''
+
+def build_personajes():
+    rel = "../"; canon = SITE + "/personajes/"
+    title = "Personajes de GTA 6: todo el reparto, explicado | GTA MASTER"
+    desc = "Todos los personajes de GTA 6: Jason Duval, Lucia Caminos, Raul Bautista, Brian Heder, Boobie Ike, Cal Hampton, Dre'Quan Priest, Real Dimez, Andrés de León y Petra Navarro."
+    schema = {"@context": "https://schema.org", "@graph": [ORG,
+        {"@type": "CollectionPage", "@id": canon, "url": canon, "name": title, "description": desc, "inLanguage": "es", "isPartOf": {"@id": SITE + "/#web"},
+         "about": {"@type": "VideoGame", "name": "Grand Theft Auto VI"}, "citation": [u for _, u in CAST_SOURCES]},
+        {"@type": "ItemList", "name": "Personajes de GTA 6", "numberOfItems": len(CAST), "itemListElement": [
+            {"@type": "ListItem", "position": i + 1, "name": c["n"], "url": f"{canon}#{c['slug']}",
+             "image": f"{SITE}/assets/personajes/{c['slug']}.jpg" if not c["v"] else f"{SITE}/assets/thumbs/{c['v']}.jpg"} for i, c in enumerate(CAST)]},
+        {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Inicio", "item": SITE + "/"}, {"@type": "ListItem", "position": 2, "name": "Personajes de GTA 6", "item": canon}]}]}
+    h = head(title, desc, canon, SITE + "/assets/personajes/raul-bautista.jpg", rel, schema)
+    idx = "".join(f'<a class="chip" href="#{c["slug"]}">{esc(c["n"])}</a>' for c in CAST)
+    secs = "".join(char_section(c, k, rel, full=True) for k, c in enumerate(CAST))
+    src = "".join(f'<li><a href="{u}" target="_blank" rel="noopener">{esc(n)}</a></li>' for n, u in CAST_SOURCES)
+    body = f'''<main id="main"><section class="vhero bgpar">{bgimg("club-art-deco", rel=rel, eager=True)}<span class="bgpar__veil bgpar__veil--vhero" aria-hidden="true"></span>
+<nav class="crumbs" aria-label="Migas de pan"><ol><li><a href="{rel}">Inicio</a></li><li aria-current="page">Personajes</li></ol></nav>
+<span class="eyebrow px">Quién es quién</span><h1>Personajes de GTA 6</h1><p class="lead">Los dos protagonistas y el reparto secundario confirmado de Grand Theft Auto VI, con lo que se sabe de cada uno.</p>
+<div class="chips" style="margin-top:1.6rem">{idx}</div></section>
+<section class="cast">{secs}</section>
+<div class="wrap" style="padding-block:3rem 5rem"><aside class="sources"><h2>Fuentes</h2><ul>{src}</ul>
+<p>Las portadas de los personajes sin vídeo son diseños de GTA MASTER con fondos propios; no reproducen arte oficial de Rockstar.</p></aside></div></main>
+'''
+    d = os.path.join(OUT, "personajes"); os.makedirs(d, exist_ok=True)
+    open(os.path.join(d, "index.html"), "w").write(h + body + footer(rel))
+
 def build_index():
     rel = "../"; canon = SITE + "/videos/"
     title = "Vídeos de GTA 6 en español | GTA MASTER"
@@ -519,7 +594,7 @@ def build_index():
 
 def build_meta():
     today = datetime.now(MAD).strftime("%Y-%m-%d")
-    urls = [(SITE + "/", today, "daily", "1.0"), (SITE + "/videos/", today, "daily", "0.9"), (SITE + "/blog/", today, "daily", "0.9")]
+    urls = [(SITE + "/", today, "daily", "1.0"), (SITE + "/videos/", today, "daily", "0.9"), (SITE + "/blog/", today, "daily", "0.9"), (SITE + "/personajes/", today, "weekly", "0.9")]
     urls += [(purl(p), p.get("updated", p["date"])[:10], "weekly", "0.8") for p in POSTS]
     vids = []
     for v in V:
@@ -540,6 +615,7 @@ def build_meta():
     llms = [f"# GTA MASTER", "", "> Web y canal de YouTube en español sobre Grand Theft Auto VI (GTA 6): detalles que no viste, personajes, mapa de Leonida, Vice City y curiosidades, analizados con material oficial de Rockstar Games. Web de fans, no oficial.", "",
             f"- Canal de YouTube: {CHANNEL}", f"- Lanzamiento de GTA 6: 19 de noviembre de 2026, PS5 y Xbox Series X|S", "", "## Vídeos"]
     llms += [f"- [{v['h1']}]({vurl(v)}): {v['desc']}" for v in V]
+    llms += ["", "## Personajes de GTA 6", f"- [Todos los personajes]({SITE}/personajes/): " + ", ".join(c["n"] for c in CAST)]
     llms += ["", "## Noticias (blog)"] + [f"- [{p['title']}]({purl(p)}): {p['desc']}" for p in POSTS[:20]]
     llms += ["", "## Páginas", f"- [Inicio]({SITE}/): resumen del canal, personajes, regiones de Leonida y preguntas frecuentes", f"- [Todos los vídeos]({SITE}/videos/)"]
     open(os.path.join(OUT, "llms.txt"), "w").write("\n".join(llms) + "\n")
@@ -551,5 +627,5 @@ def build_meta():
 if __name__ == "__main__":
     build_home()
     for v in V: build_video(v)
-    build_index(); build_posts(); build_blog_index(); build_meta()
+    build_index(); build_posts(); build_blog_index(); build_personajes(); build_meta()
     print("OK:", len(V), "vídeos")

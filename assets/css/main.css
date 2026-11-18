@@ -137,8 +137,8 @@ section{position:relative}
 .char__media,.char__copy{position:relative;z-index:1}
 .char__media a{display:block;border-radius:var(--r);overflow:hidden;clip-path:inset(0 0 0 0 round 18px);box-shadow:0 30px 70px -25px rgba(0,0,0,.8)}
 .char__media img{aspect-ratio:16/9;object-fit:cover;width:100%}
-.char__copy h3{font-family:var(--f-display);font-size:clamp(2.4rem,1.6rem + 3.2vw,4.6rem);text-transform:uppercase;line-height:.95;margin-bottom:1rem}
-.char__copy p{color:var(--txt-2)}
+.char__copy h3,.char__copy .char__h{font-family:var(--f-display);font-size:clamp(2.4rem,1.6rem + 3.2vw,4.6rem);text-transform:uppercase;line-height:.95;margin-bottom:1rem}
+.char__copy p{color:var(--txt-2)}.char__copy p+p{margin-top:.9rem}.char__copy .pill{margin-top:1.4rem}.char{scroll-margin-top:70px}
 .link-arrow{display:inline-flex;align-items:center;gap:.5rem;font-family:var(--f-ui);font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--oro);text-decoration:none;min-height:44px}
 .link-arrow:hover{gap:.85rem}
 @media (max-width:820px){.char__inner{grid-template-columns:1fr}.char:nth-of-type(even) .char__media{order:0}}
