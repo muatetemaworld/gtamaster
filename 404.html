@@ -3,6 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; media-src 'self'; frame-src https://www.youtube-nocookie.com https://www.youtube.com; object-src 'none'; base-uri 'self'; form-action 'none'; upgrade-insecure-requests">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <title>Página no encontrada | GTA MASTER</title>
 <meta name="description" content="Esta página no existe.">
 <link rel="canonical" href="https://gtamaster.es/404.html">
@@ -28,9 +30,7 @@
 <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/icon-32.png">
 <link rel="apple-touch-icon" href="/assets/img/icon-180.png">
 <link rel="manifest" href="/site.webmanifest">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;600&family=Press+Start+2P&display=swap">
+<link rel="stylesheet" href="/assets/css/fonts.css">
 <link rel="stylesheet" href="/assets/css/main.css">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"404"}</script>
 </head>
@@ -54,8 +54,8 @@
   </div>
   <small>© <span data-year>2026</span> GTA MASTER · Web de fans, no oficial. Grand Theft Auto, GTA y Grand Theft Auto VI son marcas de Take-Two Interactive. Esta web no está afiliada a Rockstar Games ni a Take-Two. Las imágenes de los vídeos son miniaturas del canal GTA MASTER.</small>
 </footer>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
+<script src="/assets/js/vendor/gsap.min.js" defer></script>
+<script src="/assets/js/vendor/ScrollTrigger.min.js" defer></script>
 <script src="/assets/js/main.js" defer></script>
 </body>
 </html>

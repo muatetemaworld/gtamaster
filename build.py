@@ -84,6 +84,20 @@ CAST_SOURCES = [("Rockstar Games: personajes de GTA VI", "https://www.rockstarga
                 ("PC Gamer: GTA 6 characters", "https://www.pcgamer.com/games/action/grand-theft-auto/gta6-characters"),
                 ("Stevivor: GTA 6 characters", "https://stevivor.com/guides/gta-6-characters/")]
 
+# ---------- seguridad ----------
+# GitHub Pages no deja enviar cabeceras HTTP, así que la política de seguridad
+# va en una etiqueta <meta>. Solo se ejecutan scripts de la propia web (nada en
+# línea ni de terceros) y solo se incrustan reproductores de YouTube.
+CSP = ("default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; "
+       "font-src 'self'; connect-src 'self'; media-src 'self'; "
+       "frame-src https://www.youtube-nocookie.com https://www.youtube.com; "
+       "object-src 'none'; base-uri 'self'; form-action 'none'; upgrade-insecure-requests")
+
+def ld_json(obj):
+    """JSON-LD seguro dentro de <script>: un texto con «</script>» no puede cerrar la etiqueta."""
+    return (json.dumps(obj, ensure_ascii=False, separators=(",", ":"))
+            .replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026"))
+
 # ---------- piezas comunes ----------
 YT_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.6 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg>'
 PLAY = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M5 3l16 9-16 9z"/></svg>'
@@ -94,6 +108,8 @@ def head(title, desc, canon, img, rel, schema, extra=""):
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="{CSP}">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <title>{esc(title)}</title>
 <meta name="description" content="{esc(desc)}">
 <link rel="canonical" href="{canon}">
@@ -119,11 +135,9 @@ def head(title, desc, canon, img, rel, schema, extra=""):
 <link rel="icon" type="image/png" sizes="32x32" href="{rel}assets/img/icon-32.png">
 <link rel="apple-touch-icon" href="{rel}assets/img/icon-180.png">
 <link rel="manifest" href="{rel}site.webmanifest">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;600&family=Press+Start+2P&display=swap">
+<link rel="stylesheet" href="{rel}assets/css/fonts.css">
 <link rel="stylesheet" href="{rel}assets/css/main.css">
-{extra}<script type="application/ld+json">{json.dumps(schema, ensure_ascii=False, separators=(",", ":"))}</script>
+{extra}<script type="application/ld+json">{ld_json(schema)}</script>
 </head>
 <body>
 <a class="skip" href="#main">Saltar al contenido</a>
@@ -150,8 +164,8 @@ def footer(rel):
   </div>
   <small>© <span data-year>2026</span> GTA MASTER · Web de fans, no oficial. Grand Theft Auto, GTA y Grand Theft Auto VI son marcas de Take-Two Interactive. Esta web no está afiliada a Rockstar Games ni a Take-Two. Las imágenes de los vídeos son miniaturas del canal GTA MASTER.</small>
 </footer>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
+<script src="{rel}assets/js/vendor/gsap.min.js" defer></script>
+<script src="{rel}assets/js/vendor/ScrollTrigger.min.js" defer></script>
 <script src="{rel}assets/js/main.js" defer></script>
 </body>
 </html>
@@ -409,9 +423,11 @@ def _inline(s, rel):
     s = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", s)
     def link(m):
         t, u = m.group(1), m.group(2).replace("&amp;", "&")
-        if u.startswith("/"):
-            return f'<a href="{rel}{u.lstrip("/")}">{t}</a>'
-        return f'<a href="{esc(u)}" target="_blank" rel="noopener">{t}</a>'
+        if u.startswith("/") and not u.startswith("//"):
+            return f'<a href="{rel}{esc(u.lstrip("/"))}">{t}</a>'
+        if re.match(r"^https?://[\w.-]+(/|$)", u, re.I):
+            return f'<a href="{esc(u)}" target="_blank" rel="noopener noreferrer">{t}</a>'
+        return t  # cualquier otro esquema (javascript:, data:…) se queda en texto plano
     return re.sub(r"\[([^\]]+)\]\(([^)\s]+)\)", link, s)
 
 def yt_embed(vid, title):
@@ -624,7 +640,51 @@ def build_meta():
     open(os.path.join(OUT, "404.html"), "w").write(head("Página no encontrada | GTA MASTER", "Esta página no existe.", SITE + "/404.html", SITE + "/assets/img/og-gta-master.jpg", "/", {"@context": "https://schema.org", "@type": "WebPage", "name": "404"}).replace('content="index, follow', 'content="noindex, follow') +
         '<main id="main"><section class="vhero" style="min-height:70vh"><h1>Wasted. Esta página no existe.</h1><p class="lead">Vuelve a <a href="/">la portada</a> o mira <a href="/videos/">todos los vídeos de GTA 6</a>.</p></section></main>' + footer("/"))
 
+# ---------- validación de datos (barrera contra contenido malicioso) ----------
+# Las tareas automáticas escriben en data/videos.json y data/posts.json a partir
+# de contenido de Internet. Si algo no cumple estas reglas, la web NO se genera.
+def validar():
+    errores = []
+    rx_slug = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
+    rx_id = re.compile(r"^[A-Za-z0-9_-]{11}$")
+    rx_url = re.compile(r"^https?://[A-Za-z0-9.-]+(?:[/?#][^\s<>\"']*)?$")
+    peligroso = re.compile(r"<\s*/?\s*(script|iframe|object|embed|style|form|meta|link|svg|base)\b|javascript\s*:|data\s*:\s*text/html|vbscript\s*:|\son[a-z]+\s*=", re.I)
+    def texto(origen, campo, valor):
+        if isinstance(valor, str) and peligroso.search(valor):
+            errores.append(f"{origen}: contenido peligroso en «{campo}»")
+        elif isinstance(valor, list):
+            for x in valor: texto(origen, campo, x)
+        elif isinstance(valor, dict):
+            for k, x in valor.items(): texto(origen, f"{campo}.{k}", x)
+    vistos = set()
+    for v in V:
+        o = f"vídeo {v.get('id')}"
+        if not rx_id.match(str(v.get("id", ""))): errores.append(f"{o}: id de YouTube no válido")
+        if not rx_slug.match(str(v.get("slug", ""))): errores.append(f"{o}: slug no válido")
+        if v.get("slug") in vistos: errores.append(f"{o}: slug repetido")
+        vistos.add(v.get("slug"))
+        try: datetime.fromisoformat(v["up"])
+        except Exception: errores.append(f"{o}: fecha no válida")
+        for k, x in v.items(): texto(o, k, x)
+    vistos = set()
+    for p in POSTS:
+        o = f"noticia {p.get('slug')}"
+        if not rx_slug.match(str(p.get("slug", ""))): errores.append(f"{o}: slug no válido")
+        if p.get("slug") in vistos: errores.append(f"{o}: slug repetido")
+        vistos.add(p.get("slug"))
+        try: datetime.fromisoformat(p["date"])
+        except Exception: errores.append(f"{o}: fecha no válida")
+        if p.get("fondo", "horizonte-neon-noche") not in BG: errores.append(f"{o}: fondo desconocido")
+        for s_ in p.get("sources", []):
+            if not rx_url.match(s_.get("url", "")): errores.append(f"{o}: URL de fuente no válida")
+        for vid in re.findall(r"\{\{youtube:([^|}]+)", p.get("body", "")):
+            if not rx_id.match(vid.strip()): errores.append(f"{o}: id de YouTube no válido en el texto")
+        for k, x in p.items(): texto(o, k, x)
+    if errores:
+        raise SystemExit("VALIDACIÓN DE SEGURIDAD FALLIDA. La web no se ha generado:\n- " + "\n- ".join(errores))
+
 if __name__ == "__main__":
+    validar()
     build_home()
     for v in V: build_video(v)
     build_index(); build_posts(); build_blog_index(); build_personajes(); build_meta()

@@ -1,3 +1,11 @@
+/* Seguridad: la web no se puede mostrar dentro de un marco ajeno (clickjacking).
+   GitHub Pages no permite la cabecera X-Frame-Options, así que se hace aquí. */
+(function () {
+  if (window.top !== window.self) {
+    try { window.top.location.replace(window.self.location.href); }
+    catch (e) { document.documentElement.style.display = 'none'; }
+  }
+})();
 /* GTA MASTER · interacciones y scroll */
 (function () {
   var d = document, w = window, root = d.documentElement;
