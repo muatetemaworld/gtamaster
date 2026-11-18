@@ -1,0 +1,62 @@
+name: Actualizar vídeos y publicar la web
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "23 * * * *"   # cada hora: busca vídeos nuevos en el canal
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      nuevos: ${{ steps.yt.outputs.nuevos }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install --quiet pillow
+      - name: Buscar vídeos nuevos en YouTube
+        id: yt
+        run: python scripts/actualizar_videos.py
+      - name: Generar la web
+        run: python build.py
+      - name: Guardar los vídeos nuevos en el repositorio
+        if: steps.yt.outputs.nuevos != '0'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Añade ${{ steps.yt.outputs.nuevos }} vídeo(s) nuevo(s) del canal"
+          git push
+      - name: Preparar los archivos publicables
+        run: |
+          mkdir _site
+          rsync -a --exclude '.git' --exclude '.github' --exclude 'scripts' --exclude 'data' \
+            --exclude 'build.py' --exclude 'README.md' --exclude '_site' ./ _site/
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    if: github.event_name != 'schedule' || needs.build.outputs.nuevos != '0'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
