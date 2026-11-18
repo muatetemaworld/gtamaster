@@ -371,3 +371,16 @@ a.player__btn,a.vcard__play{text-decoration:none}
 .sources a{color:var(--cian)}
 .sources p{font-size:.9rem;color:var(--txt-2);margin:0}
 .post__more{padding-bottom:5rem}
+
+/* ---------- comentarios (Disqus) ---------- */
+.comments{margin:3rem 0 1rem;padding:clamp(1.4rem,3vw,2.2rem);border:1px solid var(--line);border-radius:22px;background:linear-gradient(160deg,rgba(232,44,122,.10),rgba(60,208,226,.06) 60%,rgba(13,10,44,.4));scroll-margin-top:80px}
+.comments__head h2{font-family:var(--f-display);text-transform:uppercase;font-size:clamp(2rem,1.5rem + 1.6vw,2.8rem);line-height:1;margin:.3rem 0 1rem;color:var(--crema)}
+.comments__rules{list-style:none;padding:0;margin:0 0 1.4rem;display:grid;gap:.55rem}
+.comments__rules li{color:var(--txt-2);font-size:.98rem;padding-left:1.4rem;position:relative}
+.comments__rules li::before{content:"";position:absolute;left:0;top:.55em;width:.55rem;height:.55rem;border-radius:50%;background:linear-gradient(135deg,var(--cian),var(--magenta))}
+.comments__rules b{color:var(--crema)}
+.comments__btn{cursor:pointer;border:0;font:inherit}
+.comments__note{font-size:.85rem;color:var(--txt-2);margin:.9rem 0 0;max-width:62ch}
+.comments__note a{color:var(--cian)}
+#disqus_thread{margin-top:1rem;border-radius:16px}
+#disqus_thread:not(:empty){background:#f6f1ff;padding:1rem;color:#1a1040}

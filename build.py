@@ -93,6 +93,30 @@ CSP = ("default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline';
        "frame-src https://www.youtube-nocookie.com https://www.youtube.com; "
        "object-src 'none'; base-uri 'self'; form-action 'none'; upgrade-insecure-requests")
 
+# Comentarios con Disqus (solo en las noticias del blog y solo si el lector los abre).
+DISQUS = "gtamaster-es"
+CSP_COMENTARIOS = ("default-src 'self'; script-src 'self' https://*.disqus.com https://*.disquscdn.com; "
+       "style-src 'self' 'unsafe-inline' https://*.disquscdn.com; img-src 'self' data: https://*.disqus.com https://*.disquscdn.com; "
+       "font-src 'self' https://*.disquscdn.com; connect-src 'self' https://*.disqus.com; media-src 'self'; "
+       "frame-src https://www.youtube-nocookie.com https://www.youtube.com https://disqus.com https://*.disqus.com; "
+       "object-src 'none'; base-uri 'self'; form-action 'none'; upgrade-insecure-requests")
+
+def comentarios(p, canon, rel):
+    if not DISQUS: return ""
+    return f'''<section class="comments" id="comentarios" aria-labelledby="t-com">
+  <div class="comments__head"><span class="eyebrow px">Comunidad</span><h2 id="t-com">Comentarios</h2></div>
+  <ul class="comments__rules">
+    <li><b>Sin spoilers sin avisar.</b> Si cuentas algo de la historia, avísalo al principio o usa la etiqueta de spoiler.</li>
+    <li><b>Respeto.</b> Nada de insultos, odio ni acoso. Se debate el juego, no a las personas.</li>
+    <li><b>Sin enlaces a filtraciones, piratería ni estafas.</b> Los mensajes con enlaces sospechosos se borran.</li>
+  </ul>
+  <div class="comments__gate" data-disqus="{DISQUS}" data-url="{canon}" data-id="blog-{p["slug"]}" data-title="{esc(p["title"])}">
+    <button type="button" class="pill comments__btn"><span>Ver y escribir comentarios</span>{ARROW}</button>
+    <p class="comments__note">Los comentarios funcionan con Disqus: puedes entrar con Google, Facebook, X o tu email. Al pulsar el botón se conecta con Disqus, que usa sus propias cookies. Más información en nuestra <a href="{rel}privacidad/">política de privacidad</a>.</p>
+  </div>
+  <div id="disqus_thread"></div>
+</section>'''
+
 def ld_json(obj):
     """JSON-LD seguro dentro de <script>: un texto con «</script>» no puede cerrar la etiqueta."""
     return (json.dumps(obj, ensure_ascii=False, separators=(",", ":"))
@@ -102,13 +126,13 @@ def ld_json(obj):
 YT_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.6 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg>'
 PLAY = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M5 3l16 9-16 9z"/></svg>'
 
-def head(title, desc, canon, img, rel, schema, extra=""):
+def head(title, desc, canon, img, rel, schema, extra="", csp=None):
     return f'''<!DOCTYPE html>
 <html lang="es" class="no-js">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="{CSP}">
+<meta http-equiv="Content-Security-Policy" content="{csp or CSP}">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>{esc(title)}</title>
 <meta name="description" content="{esc(desc)}">
@@ -160,13 +184,14 @@ def footer(rel):
     <div><h2>GTA MASTER</h2><p>GTA 6 en español: detalles que no viste, personajes, mapa de Leonida y curiosidades, con material oficial de Rockstar Games.</p>
     <p><a class="btn btn--yt" href="{SUB}" target="_blank" rel="noopener">{YT_ICON}<span>Canal de YouTube</span></a></p></div>
     <div><h2>Últimos vídeos</h2><ul>{vids}</ul></div>
-    <div><h2>Más análisis</h2><ul>{vids2}<li><a href="{rel}videos/">Todos los vídeos</a></li><li><a href="{rel}blog/">Blog de noticias</a></li></ul></div>
+    <div><h2>Más análisis</h2><ul>{vids2}<li><a href="{rel}videos/">Todos los vídeos</a></li><li><a href="{rel}blog/">Blog de noticias</a></li><li><a href="{rel}privacidad/">Privacidad y cookies</a></li></ul></div>
   </div>
   <small>© <span data-year>2026</span> GTA MASTER · Web de fans, no oficial. Grand Theft Auto, GTA y Grand Theft Auto VI son marcas de Take-Two Interactive. Esta web no está afiliada a Rockstar Games ni a Take-Two. Las imágenes de los vídeos son miniaturas del canal GTA MASTER.</small>
 </footer>
 <script src="{rel}assets/js/vendor/gsap.min.js" defer></script>
 <script src="{rel}assets/js/vendor/ScrollTrigger.min.js" defer></script>
 <script src="{rel}assets/js/main.js" defer></script>
+<script src="{rel}assets/js/comentarios.js" defer></script>
 </body>
 </html>
 '''
@@ -479,7 +504,7 @@ def build_posts():
                 {"@type": "ListItem", "position": 2, "name": "Blog", "item": SITE + "/blog/"},
                 {"@type": "ListItem", "position": 3, "name": p["title"], "item": canon}]}]}
         h = head(title, p["desc"], canon, img, rel, schema,
-                 f'<meta property="article:published_time" content="{p["date"]}">\n<link rel="alternate" type="application/rss+xml" title="Blog GTA MASTER" href="{SITE}/blog/feed.xml">\n')
+                 f'<meta property="article:published_time" content="{p["date"]}">\n<link rel="alternate" type="application/rss+xml" title="Blog GTA MASTER" href="{SITE}/blog/feed.xml">\n', csp=CSP_COMENTARIOS)
         h = h.replace('<meta property="og:type" content="website">', '<meta property="og:type" content="article">')
         src = "".join(f'<li><a href="{esc(s["url"])}" target="_blank" rel="noopener">{esc(s["name"])}</a>{(" · " + esc(s["note"])) if s.get("note") else ""}</li>' for s in p.get("sources", []))
         others = [x for x in POSTS if x["slug"] != p["slug"]][:3]
@@ -499,6 +524,7 @@ def build_posts():
     <aside class="sources" aria-label="Fuentes"><h2>Fuentes</h2><ul>{src}</ul>
       <p>Las noticias de GTA MASTER se basan en las fuentes citadas. Si algo es un rumor, lo indicamos.</p></aside>
     <p><a class="btn btn--yt" href="{SUB}" target="_blank" rel="noopener">{YT_ICON}<span>Más GTA 6 en YouTube</span></a></p>
+    {comentarios(p, canon, rel)}
   </div>
 </article>
 {more}
@@ -586,6 +612,28 @@ def build_personajes():
 <p>Las portadas de los personajes son ilustraciones originales de GTA MASTER, creadas con IA a partir de escenas de su mundo. No reproducen arte oficial de Rockstar ni dibujan a los personajes.</p></aside></div></main>
 '''
     d = os.path.join(OUT, "personajes"); os.makedirs(d, exist_ok=True)
+    open(os.path.join(d, "index.html"), "w").write(h + body + footer(rel))
+
+def build_privacidad():
+    rel = "../"; canon = SITE + "/privacidad/"
+    title = "Política de privacidad y cookies | GTA MASTER"
+    desc = "Qué datos trata GTA MASTER, qué servicios externos usa (YouTube y Disqus) y cómo funcionan sus cookies."
+    schema = {"@context": "https://schema.org", "@graph": [ORG, {"@type": "WebPage", "@id": canon, "url": canon, "name": title, "inLanguage": "es"}]}
+    h = head(title, desc, canon, SITE + "/assets/img/og-gta-master.jpg", rel, schema).replace(
+        '<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">', '<meta name="robots" content="noindex, follow">')
+    body = f'''<main id="main"><section class="vhero bgpar">{bgimg("bahia-urbana", rel=rel, eager=True)}<span class="bgpar__veil bgpar__veil--vhero" aria-hidden="true"></span>
+<nav class="crumbs" aria-label="Migas de pan"><ol><li><a href="{rel}">Inicio</a></li><li aria-current="page">Privacidad</li></ol></nav>
+<span class="eyebrow px">Transparencia</span><h1>Privacidad y cookies</h1><p class="lead">Última actualización: 18 de noviembre de 2026.</p></section>
+<div class="post__wrap"><div class="post__body">
+<h2>Quién está detrás</h2><p>GTA MASTER es una web de fans, no oficial, del canal de YouTube <a href="{CHANNEL}" target="_blank" rel="noopener">@GtaMaster2027</a>. Para cualquier consulta sobre tus datos puedes escribirnos a través del canal.</p>
+<h2>Qué datos tratamos</h2><p>Esta web no tiene formularios, no pide registro y no usa cookies propias ni herramientas de analítica. Está alojada en GitHub Pages, que registra datos técnicos de cada visita (como la dirección IP) por seguridad, según su propia política de privacidad.</p>
+<h2>Vídeos de YouTube</h2><p>Los vídeos de las noticias se muestran con el modo de privacidad mejorada de YouTube (youtube-nocookie.com). YouTube solo guarda información cuando le das al play. Los botones «Ver en YouTube» te llevan a youtube.com, que tiene su propia política de privacidad y cookies.</p>
+<h2>Comentarios (Disqus)</h2><p>Los comentarios del blog funcionan con Disqus. No se carga nada de Disqus hasta que pulsas «Ver y escribir comentarios»: al hacerlo, aceptas conectar con Disqus, que puede usar cookies y tratar tus datos según su <a href="https://help.disqus.com/en/articles/1717103-disqus-privacy-policy" target="_blank" rel="noopener">política de privacidad</a>. Si comentas, lo que publiques (nombre, foto de perfil y mensaje) es público. Puedes borrar tus comentarios y tu cuenta desde Disqus.</p>
+<h2>Normas de la comunidad</h2><ul><li>Sin spoilers sin avisar.</li><li>Respeto: nada de insultos, odio ni acoso.</li><li>Sin enlaces a filtraciones, piratería ni estafas.</li></ul><p>Podemos borrar los comentarios que no las cumplan y bloquear a quien las incumpla de forma repetida.</p>
+<h2>Tus derechos</h2><p>Puedes pedir acceso, rectificación o supresión de tus datos escribiéndonos a través del canal o directamente a Disqus en lo que se refiere a los comentarios. También puedes reclamar ante la Agencia Española de Protección de Datos (aepd.es).</p>
+</div></div></main>
+'''
+    d = os.path.join(OUT, "privacidad"); os.makedirs(d, exist_ok=True)
     open(os.path.join(d, "index.html"), "w").write(h + body + footer(rel))
 
 def build_index():
@@ -687,5 +735,5 @@ if __name__ == "__main__":
     validar()
     build_home()
     for v in V: build_video(v)
-    build_index(); build_posts(); build_blog_index(); build_personajes(); build_meta()
+    build_index(); build_posts(); build_blog_index(); build_personajes(); build_privacidad(); build_meta()
     print("OK:", len(V), "vídeos")
