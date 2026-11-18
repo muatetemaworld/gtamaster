@@ -6,7 +6,7 @@ import json, os, random, html
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
-SITE = "https://www.gtamaster.es"          # <-- dominio definitivo
+SITE = "https://gtamaster.es"          # <-- dominio definitivo
 CHANNEL = "https://www.youtube.com/@GtaMaster2027"
 CHANNEL_ID = "UCqBGUFmTDtnCzhu-uYCf7SA"
 SUB = CHANNEL + "?sub_confirmation=1"

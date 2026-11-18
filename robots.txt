@@ -18,4 +18,4 @@ Allow: /
 User-agent: Google-Extended
 Allow: /
 
-Sitemap: https://www.gtamaster.es/sitemap.xml
+Sitemap: https://gtamaster.es/sitemap.xml
