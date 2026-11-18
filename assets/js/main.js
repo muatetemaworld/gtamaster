@@ -1,6 +1,8 @@
 /* Seguridad: la web no se puede mostrar dentro de un marco ajeno (clickjacking).
    GitHub Pages no permite la cabecera X-Frame-Options, así que se hace aquí. */
 (function () {
+  /* Respaldo: si alguien entra por http, pasa a https (GitHub ya lo fuerza al activar «Enforce HTTPS»). */
+  if (location.protocol === 'http:' && /(^|\.)gtamaster\.es$/.test(location.hostname)) { location.replace('https://' + location.host + location.pathname + location.search + location.hash); return; }
   if (window.top !== window.self) {
     try { window.top.location.replace(window.self.location.href); }
     catch (e) { document.documentElement.style.display = 'none'; }
