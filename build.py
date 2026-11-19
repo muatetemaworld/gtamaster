@@ -2,7 +2,7 @@
 """Genera la web estática de GTA MASTER (home, páginas de vídeo, sitemap, robots, llms.txt).
 Cambia SITE por tu dominio definitivo y vuelve a ejecutar: python3 build.py
 """
-import json, os, random, html, re
+import unicodedata, json, os, random, html, re
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
@@ -256,6 +256,42 @@ def vcard(v, rel):
             f'<a class="vcard__play" href="{yt(v["id"])}" target="_blank" rel="noopener" data-yt-out aria-label="Ver en YouTube: {esc(v["h1"])}">{PLAY_IC}</a>'
             f'</article>')
 
+# ---------- RADIOS (confirmadas por Rockstar el 8 oct 2026) ----------
+RADIOS = [
+    {"n": "Cocoteo FM", "slug": "cocoteo-fm", "g": "Latino moderno", "d": "Reguetón, bachata, merengue y dembow.", "h": "El Martillo y La Gata", "voz": "Bad Bunny y RaiNao", "v": "P1LpnlrMHhg", "c1": "#ff4fa3", "c2": "#ffb347"},
+    {"n": "AfroBank FM", "slug": "afrobank-fm", "g": "Afro y amapiano", "d": "Amapiano, clásicos africanos y 3-step.", "h": "Burna y Palmsy", "voz": "Burna Boy y Palms Trax", "v": "V4_fmyQfsd0", "c1": "#1fbf6b", "c2": "#ffc83e"},
+    {"n": "Flash FM", "slug": "flash-fm", "g": "Pop", "d": "La emisora de Vice City vuelve con el pop de hoy.", "h": "Robyn y Alex", "voz": "Robyn y Alex Consani", "v": None, "c1": "#3cd0e2", "c2": "#e82c7a"},
+    {"n": "Back Country Radio", "slug": "back-country-radio", "g": "Country", "d": "Country rebelde para las carreteras de Leonida.", "h": "MW y Delta Dawne", "voz": "Morgan Wallen y Lana Del Rey", "v": None, "c1": "#c8743a", "c2": "#ffd28a"},
+    {"n": "The Chamber 106.6", "slug": "the-chamber", "g": "Metal", "d": "Heavy metal clásico, sin concesiones.", "h": "DJ Kerry y DJ Tom", "voz": "Kerry King y Tom Araya (Slayer)", "v": None, "c1": "#8b1d2c", "c2": "#2a1240", "fq": "106.6"},
+    {"n": "Dirty South Classics", "slug": "dirty-south-classics", "g": "Rap del sur", "d": "Clásicos del rap y el hip-hop del sur.", "h": "Trick y Trina", "voz": "Trick Daddy y Trina", "v": None, "c1": "#7a3cff", "c2": "#ff7a59"},
+]
+EQ = '<span class="radio__eq" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>'
+
+def radio_card(r, rel=""):
+    img = os.path.exists(os.path.join(OUT, "assets", "radios", r["slug"] + ".webp"))
+    vid = BY.get(r["v"]) if r.get("v") else None
+    media = (f'<img src="{rel}assets/radios/{r["slug"]}-360.webp" srcset="{rel}assets/radios/{r["slug"]}-360.webp 360w, {rel}assets/radios/{r["slug"]}.webp 540w" sizes="(max-width:760px) 72vw, 320px" alt="{esc(r["n"])}, emisora de GTA 6" width="540" height="720" loading="lazy" decoding="async">'
+             if img else f'<span class="radio__poster" aria-hidden="true"><b>{esc(r["n"])}</b></span>')
+    cta = (f'<a class="radio__cta" href="{rel}videos/{vid["slug"]}/">Ver vídeo {ARROW}</a>' if vid
+           else f'<a class="radio__cta radio__cta--ghost" href="{rel}gta-6/#musica">Más sobre la música {ARROW}</a>')
+    return (f'<li class="radio{" radio--img" if img else ""}" style="--c1:{r["c1"]};--c2:{r["c2"]}">'
+            f'<div class="radio__media">{media}<span class="radio__shade" aria-hidden="true"></span>'
+            f'<span class="radio__badge px">{esc(r.get("fq") or r["g"])}</span>{EQ}</div>'
+            f'<div class="radio__body"><h3>{esc(r["n"])}</h3><p class="radio__g">{esc(r["g"])} · {esc(r["d"])}</p>'
+            f'<p class="radio__h">Presentan <strong>{esc(r["h"])}</strong><span> (voces de {esc(r["voz"])})</span></p>{cta}</div></li>')
+
+def radios_slider(rel=""):
+    cards = "".join(radio_card(r, rel) for r in RADIOS)
+    cards += ('<li class="radio radio--more" style="--c1:#3a1a6e;--c2:#0d0a2c"><div class="radio__media"><span class="radio__poster" aria-hidden="true"><b>+</b></span></div>'
+              '<div class="radio__body"><h3>Más emisoras</h3><p class="radio__g">Rockstar ha confirmado 6 de momento. Añadiremos el resto en cuanto se publique la lista completa.</p>'
+              f'<a class="radio__cta radio__cta--ghost" href="{rel}videos/#musica">Vídeos de música {ARROW}</a></div></li>')
+    return f'''<section class="radios wrap" id="radios" aria-labelledby="t-radios">
+  <div class="radios__head"><div><span class="eyebrow px reveal">Sintoniza Leonida</span><h2 class="h2 reveal" id="t-radios">Radios de <span class="grad-text">GTA 6</span></h2></div>
+  <div class="radios__nav"><button type="button" class="radios__btn" data-dir="-1" aria-label="Emisora anterior" aria-controls="radios-track">←</button><button type="button" class="radios__btn" data-dir="1" aria-label="Emisora siguiente" aria-controls="radios-track">→</button></div></div>
+  <ul class="radios__track" id="radios-track" tabindex="0" aria-label="Emisoras de radio de GTA 6">{cards}</ul>
+  <p class="radios__src">Emisoras y presentadores confirmados por Rockstar Games el 8 de octubre de 2026.</p>
+</section>'''
+
 def banner(key, eyebrow, title, text, href, cta, side="left", ext=False, eclass=""):
     tgt = ' target="_blank" rel="noopener"' if ext else ""
     return (f'<article class="banner banner--{side} reveal">{bgimg(key, cls="banner__img")}<span class="banner__shade" aria-hidden="true"></span>'
@@ -347,6 +383,7 @@ def build_home():
 <section class="banners wrap" aria-label="Destacados">
   {banner("club-art-deco", "Música · Cocoteo FM", "La radio latina de GTA&nbsp;6", "Bad Bunny y RaiNao presentan Cocoteo FM: bachata, merengue, dembow y reguetón para las noches de Vice City. Diez curiosidades en el vídeo.", "videos/" + coco["slug"] + "/", "Descubre más", side="left", eclass="is-cian")}
 </section>
+{radios_slider("")}
 
 <section class="cast sec" id="personajes" aria-labelledby="t-cast">
   <div class="wrap"><span class="eyebrow px reveal">Quién es quién</span><h2 class="h2 reveal" id="t-cast">Personajes de <span class="grad-text">GTA 6</span></h2>
@@ -773,7 +810,7 @@ def build_index():
     cats = []
     for c in ["Personajes", "Leonida", "Música", "Mecánicas", "Historia", "Curiosidades", "Análisis", "Shorts"]:
         vs = [v for v in V if v["cat"] == c]
-        if vs: cats.append(f'<h2 class="h2" style="font-size:clamp(2rem,1.4rem + 2.5vw,3.6rem);margin:3.5rem 0 1.5rem">GTA 6: {c.lower()}</h2><div class="vgrid">{"".join(vcard(v, rel) for v in vs)}</div>')
+        if vs: cats.append(f'<h2 class="h2" id="{unicodedata.normalize("NFKD", c).encode("ascii","ignore").decode().lower()}" style="font-size:clamp(2rem,1.4rem + 2.5vw,3.6rem);margin:3.5rem 0 1.5rem">GTA 6: {c.lower()}</h2><div class="vgrid">{"".join(vcard(v, rel) for v in vs)}</div>')
     body = f'''<main id="main"><section class="vhero bgpar">{bgimg("horizonte-neon-noche", rel=rel, eager=True)}<span class="bgpar__veil bgpar__veil--vhero" aria-hidden="true"></span><nav class="crumbs" aria-label="Migas de pan"><ol><li><a href="{rel}">Inicio</a></li><li aria-current="page">Vídeos</li></ol></nav>
 <h1>Vídeos de GTA 6 en español</h1><p class="lead">{len(V)} análisis de Grand Theft Auto VI ordenados por tema. Todos hechos con material oficial.</p></section>
 <div class="wrap" style="padding-bottom:5rem">{"".join(cats)}</div></main>

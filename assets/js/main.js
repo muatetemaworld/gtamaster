@@ -128,5 +128,18 @@
     addEventListener('load', function () { w.ScrollTrigger.refresh(); });
   }
 
+
+  /* Slider de radios */
+  function radiosSlider() {
+    var t = d.getElementById('radios-track'); if (!t) return;
+    var btns = d.querySelectorAll('.radios__btn');
+    function step() { var c = t.querySelector('.radio'); return c ? c.getBoundingClientRect().width + parseFloat(getComputedStyle(t).columnGap || 16) : 300; }
+    function upd() { var max = t.scrollWidth - t.clientWidth - 2; btns[0].disabled = t.scrollLeft <= 2; btns[1].disabled = t.scrollLeft >= max; }
+    btns.forEach(function (b) { b.addEventListener('click', function () { t.scrollBy({ left: step() * +b.getAttribute('data-dir'), behavior: 'smooth' }); }); });
+    t.addEventListener('keydown', function (e) { if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); t.scrollBy({ left: step() * (e.key === 'ArrowRight' ? 1 : -1), behavior: 'smooth' }); } });
+    t.addEventListener('scroll', upd, { passive: true }); addEventListener('resize', upd); upd();
+  }
+
+  if (d.readyState === 'loading') d.addEventListener('DOMContentLoaded', radiosSlider); else radiosSlider();
   if (d.readyState === 'loading') d.addEventListener('DOMContentLoaded', init); else init();
 })();
