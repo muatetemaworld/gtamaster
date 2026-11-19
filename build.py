@@ -287,7 +287,7 @@ def radios_slider(rel=""):
     cards = "".join(radio_card(r, rel) for r in RADIOS)
     cards += ('<li class="radio radio--more" style="--c1:#3a1a6e;--c2:#0d0a2c"><div class="radio__media"><span class="radio__poster" aria-hidden="true"><b>+</b></span></div>'
               '<div class="radio__body"><h3>Más emisoras</h3><p class="radio__g">Rockstar ha confirmado 6 de momento. Añadiremos el resto en cuanto se publique la lista completa.</p>'
-              f'<a class="radio__cta radio__cta--ghost" href="{rel}videos/#musica">Vídeos de música {ARROW}</a></div></li>')
+              f'<a class="radio__cta radio__cta--ghost" href="{rel}videos/musica/">Vídeos de música {ARROW}</a></div></li>')
     return f'''<section class="radios wrap" id="radios" aria-labelledby="t-radios">
   <div class="radios__head"><div><span class="eyebrow px reveal">Sintoniza Leonida</span><h2 class="h2 reveal" id="t-radios">Radios de <span class="grad-text">GTA 6</span></h2></div>
   <div class="radios__nav"><button type="button" class="radios__btn" data-dir="-1" aria-label="Emisora anterior" aria-controls="radios-track">←</button><button type="button" class="radios__btn" data-dir="1" aria-label="Emisora siguiente" aria-controls="radios-track">→</button></div></div>
@@ -305,6 +305,47 @@ MODAL = '''<dialog class="modal" id="modal" aria-label="Reproductor de vídeo">
   <div class="modal__box"><button class="modal__close" type="button" aria-label="Cerrar">✕</button>
   <div class="modal__frame"></div><p class="modal__title"></p></div>
 </dialog>'''
+
+# ---------- CATEGORÍAS ----------
+CATS = [  # (nombre, slug, frase, color, botón relleno)
+    ("Personajes", "personajes", "Jason, Lucia y todo el reparto de Leonida.", "#e82c7a"),
+    ("Leonida", "leonida", "El mapa, sus regiones y Vice City.", "#3cd0e2"),
+    ("Música", "musica", "Radios, canciones y la banda sonora.", "#a06eff"),
+    ("Mecánicas", "mecanicas", "Policía, trucos y cómo se juega.", "#1fbf6b"),
+    ("Historia", "historia", "La trama, los golpes y las misiones.", "#ff7a59"),
+    ("Curiosidades", "curiosidades", "Detalles, anuncios y secretos ocultos.", "#ffc83e"),
+    ("Análisis", "analisis", "Los tráileres, fotograma a fotograma.", "#5b8cff"),
+    ("Shorts", "shorts", "Lo mejor de GTA 6 en menos de un minuto.", "#ff4fa3"),
+]
+def cat_videos(c): return [v for v in V if v["cat"] == c]
+def cat_card(c, slug, frase, color, rel, k):
+    vs = cat_videos(c); v = vs[0]
+    n = len(vs)
+    return (f'<article class="ccard reveal" style="--cc:{color}"><img src="{rel}assets/thumbs/{v["id"]}-v.webp" width="540" height="720" alt="" loading="lazy" decoding="async">'
+            f'<span class="ccard__shade" aria-hidden="true"></span><span class="ccard__count px">{n} vídeo{"s" if n != 1 else ""}</span>'
+            f'<div class="ccard__body"><h3>{esc(c)}</h3><p>{esc(frase)}</p>'
+            f'<a class="ccard__btn{" ccard__btn--fill" if k == 0 else ""}" href="{rel}videos/{slug}/">Ver {"los " + str(n) if n > 1 else "el vídeo"} {ARROW}</a></div></article>')
+
+def build_categorias():
+    rel = "../../"
+    activas = [x for x in CATS if cat_videos(x[0])]
+    for c, slug, frase, color in activas:
+        vs = cat_videos(c); canon = f"{SITE}/videos/{slug}/"
+        title = f"Vídeos de GTA 6: {c.lower()} | GTA MASTER"
+        desc = f"Todos los vídeos de GTA 6 sobre {c.lower()} en español: {frase[0].lower() + frase[1:]} {len(vs)} análisis de GTA MASTER."
+        schema = {"@context": "https://schema.org", "@graph": [ORG,
+            {"@type": "CollectionPage", "@id": canon, "url": canon, "name": title, "description": desc, "inLanguage": "es", "isPartOf": {"@id": SITE + "/#web"}},
+            {"@type": "ItemList", "itemListElement": [{"@type": "ListItem", "position": i + 1, "url": vurl(v)} for i, v in enumerate(vs)]},
+            {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Inicio", "item": SITE + "/"}, {"@type": "ListItem", "position": 2, "name": "Vídeos", "item": SITE + "/videos/"}, {"@type": "ListItem", "position": 3, "name": c, "item": canon}]}]}
+        h = head(title, desc, canon, f"{SITE}/assets/thumbs/{vs[0]['id']}.jpg", rel, schema)
+        otras = "".join(f'<a class="chip{" is-on" if s == slug else ""}" href="{rel}videos/{s}/"{" aria-current=\"page\"" if s == slug else ""}>{esc(n)}</a>' for n, s, _, _ in activas)
+        body = f'''<main id="main"><section class="vhero bgpar">{bgimg("horizonte-neon-noche", rel=rel, eager=True)}<span class="bgpar__veil bgpar__veil--vhero" aria-hidden="true"></span><nav class="crumbs" aria-label="Migas de pan"><ol><li><a href="{rel}">Inicio</a></li><li><a href="{rel}videos/">Vídeos</a></li><li aria-current="page">{esc(c)}</li></ol></nav>
+<h1>Vídeos de GTA 6: {esc(c.lower())}</h1><p class="lead">{esc(frase)} {len(vs)} vídeo{"s" if len(vs) != 1 else ""} en español.</p></section>
+<div class="wrap" style="padding-bottom:5rem"><nav class="chips" aria-label="Categorías de vídeos">{otras}</nav><div class="vgrid">{"".join(vcard(v, rel) for v in vs)}</div>
+<p style="margin-top:2.5rem"><a class="pill pill--ghost" href="{rel}videos/"><span>Todos los vídeos</span>{ARROW}</a></p></div></main>
+'''
+        d = os.path.join(OUT, "videos", slug); os.makedirs(d, exist_ok=True)
+        open(os.path.join(d, "index.html"), "w").write(h + body + footer(rel))
 
 def build_home():
     feat = next(v for v in V if v["id"] == "pgMlP92hjTY")
@@ -325,7 +366,7 @@ def build_home():
     rel = ""
     extra = ('<link rel="preload" as="image" href="assets/bg/costa-urbana-pastel-1600.webp" imagesrcset="assets/bg/costa-urbana-pastel-900.webp 900w, assets/bg/costa-urbana-pastel-1600.webp 1600w" imagesizes="100vw" fetchpriority="high">\n')
     h = head(title, desc, SITE + "/", SITE + "/assets/img/og-gta-master.jpg", rel, schema, extra)
-    grid = "".join(vcard(v, rel) for v in V)
+    ccards = "".join(cat_card(c, s, f, col, rel, k) for k, (c, s, f, col) in enumerate([x for x in CATS if cat_videos(x[0])]))
     cats = ["Todos"] + [c for c in ["Personajes", "Leonida", "Música", "Mecánicas", "Historia", "Curiosidades", "Análisis", "Shorts"] if any(v["cat"] == c for v in V)]
     chips = "".join(f'<button type="button" class="chip{" is-on" if c == "Todos" else ""}" data-filter="{c}" aria-pressed="{"true" if c == "Todos" else "false"}">{c}</button>' for c in cats)
     cast = "".join(char_section(c, k, "") for k, c in enumerate(CAST))
@@ -375,8 +416,8 @@ def build_home():
       <img class="hero-card__thumb" src="assets/thumbs/{feat["id"]}-640.webp" width="640" height="360" alt="Miniatura del vídeo: {esc(feat["h1"])}" loading="lazy" decoding="async">
     </article>
 
-    <div class="chips" role="group" aria-label="Filtrar vídeos por tema">{chips}</div>
-    <div class="vgrid">{grid}</div>
+    <h3 class="ccards__title reveal">Elige una categoría</h3>
+    <div class="ccards">{ccards}</div>
   </div>
 </section>
 
@@ -828,7 +869,7 @@ def build_index():
 
 def build_meta():
     today = datetime.now(MAD).strftime("%Y-%m-%d")
-    urls = [(SITE + "/", today, "daily", "1.0"), (SITE + "/videos/", today, "daily", "0.9"), (SITE + "/blog/", today, "daily", "0.9"), (SITE + "/personajes/", today, "weekly", "0.9"), (SITE + "/gta-6/", today, "daily", "1.0")]
+    urls = [(SITE + "/", today, "daily", "1.0"), (SITE + "/videos/", today, "daily", "0.9"), (SITE + "/blog/", today, "daily", "0.9"), (SITE + "/personajes/", today, "weekly", "0.9"), (SITE + "/gta-6/", today, "daily", "1.0")] + [(f"{SITE}/videos/{s}/", today, "daily", "0.8") for c, s, _, _ in CATS if cat_videos(c)]
     urls += [(purl(p), p.get("updated", p["date"])[:10], "weekly", "0.8") for p in POSTS]
     vids = []
     for v in V:
@@ -891,6 +932,9 @@ def validar():
             for x in valor: texto(origen, campo, x)
         elif isinstance(valor, dict):
             for k, x in valor.items(): texto(origen, f"{campo}.{k}", x)
+    reservados = {s for _, s, _, _ in CATS}
+    for v in V:
+        if v.get("slug") in reservados: errores.append(f"vídeo {v['id']}: el slug «{v['slug']}» choca con una categoría")
     vistos = set()
     for v in V:
         o = f"vídeo {v.get('id')}"
@@ -922,5 +966,5 @@ if __name__ == "__main__":
     validar()
     build_home()
     for v in V: build_video(v)
-    build_index(); build_posts(); build_blog_index(); build_personajes(); build_privacidad(); build_guia(); build_meta(); build_excluidos()
+    build_index(); build_categorias(); build_posts(); build_blog_index(); build_personajes(); build_privacidad(); build_guia(); build_meta(); build_excluidos()
     print("OK:", len(V), "vídeos")
