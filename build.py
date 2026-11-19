@@ -688,7 +688,7 @@ GUIA_FAQ = [
  ("¿Qué nota tiene GTA 6?", "Un 99 en Metacritic con 146 reseñas y un 99 en OpenCritic el día antes del lanzamiento, con dieces en IGN, GameSpot y Game Informer."),
  ("¿Quiénes son los protagonistas de GTA 6?", "Jason Duval y Lucia Caminos, una pareja que se mete en el crimen de Leonida. Es la primera vez que un GTA principal tiene una protagonista."),
  ("¿Dónde transcurre GTA 6?", "En Leonida, un estado ficticio inspirado en Florida, con Vice City (inspirada en Miami) como gran ciudad. Según Rockstar North, Vice City es el doble de grande que Los Santos de GTA V."),
- ("¿GTA 6 tiene trucos?", "La saga siempre los ha tenido, pero Rockstar no ha publicado la lista oficial de trucos de GTA 6. La añadiremos en cuanto esté comprobada tras el lanzamiento."),
+ ("¿GTA 6 tiene trucos?", "Sí: 61, pero solo se desbloquean al terminar la historia y cada uno pide además un reto. Se introducen con el móvil del juego (arriba en la cruceta, L1 + R1 o LB + RB y la combinación) y desactivan trofeos, logros y guardado durante esa sesión."),
 ]
 GUIA_FUENTES = [
  ("Rockstar Games: Grand Theft Auto VI", "https://www.rockstargames.com/VI"),
@@ -767,7 +767,7 @@ def build_guia():
 <h2 id="musica">Música y radios de GTA 6</h2>
 <p>La banda sonora original es del dúo francés <strong>Justice</strong>, que estrenó «Flower in a Hurricane» con el tráiler de lanzamiento. Entre las emisoras destacan {vl("cocoteo-fm", "Cocoteo FM, la radio latina con Bad Bunny")} y {vl("por-que-afrobank", "AfroBank FM, la de música africana")}, y por primera vez la radio y los podcasts te siguen también a pie. Más en {pl("gta-6-banda-sonora-justice", "la banda sonora de Justice")}.</p>
 <h2 id="trucos">Trucos de GTA 6</h2>
-<p>Rockstar todavía no ha publicado la lista oficial de trucos de GTA 6. Cuidado con las webs que ya dicen tenerla: hasta el lanzamiento, cualquier lista es inventada. Mientras tanto, repasa {vl("35-trucos", "los 35 trucos de GTA V que podrían volver")}. Publicaremos los trucos de GTA 6 en el <a href="{rel}blog/">blog</a> en cuanto estén comprobados.</p>
+<p>GTA 6 tiene <strong>61 trucos</strong>, pero no funcionan hasta que terminas la historia: entonces aparece el apartado Trucos en el menú de Progreso, y cada código pide además un reto propio (medallas en campos de tiro, entrenamientos, desafíos…). Se introducen con el móvil del juego: arriba en la cruceta, mantén L1 + R1 (LB + RB en Xbox) y mete la combinación. Al usarlos se bloquean trofeos, logros y guardado durante esa sesión. Muchos códigos aún están por descubrir; tienes los confirmados en {pl("gta-6-trucos-como-desbloquear", "cómo desbloquear los trucos de GTA 6")} y, por nostalgia, {vl("35-trucos", "los 35 trucos de GTA V que podían volver")}.</p>
 <h2 id="online">¿Y GTA Online?</h2>
 <p>Rockstar no ha detallado el modo online de GTA 6. Take-Two ha confirmado que seguirá actualizando GTA Online después del lanzamiento.</p>
 </div>
