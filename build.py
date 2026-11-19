@@ -40,13 +40,13 @@ FAQ_EXTRA = [
  ("¿Qué es GTA MASTER?", "Un canal de YouTube en español dedicado a GTA 6: detalles que no viste, personajes, mapa, curiosidades y análisis hechos con material oficial de Rockstar, sin filtraciones. Es un canal de fans, no oficial."),
 ]
 
-REGIONS = [
- ("Vice City", "La gran ciudad de Leonida, inspirada en Miami: playa, neón y vida nocturna.", "sDK3RR6bInQ", "Vice City de día vs de noche"),
- ("Leonida Keys", "Los Cayos: islas, embarcaderos y personajes como Cal Hampton.", "INVN9F4vSH8", "Quién es Cal Hampton"),
- ("Grassrivers", "Los pantanos inspirados en los Everglades, con caimanes e hidrodeslizador.", "_rBw7Wa-IVs", "Los pantanos de GTA 6"),
- ("Port Gellhorn", "La zona portuaria de Leonida.", "n8qxCiLWi28", "Las 6 regiones"),
- ("Ambrosia", "El interior de Leonida, más tranquilo que la ciudad.", "n8qxCiLWi28", "Las 6 regiones"),
- ("Mount Kalaga", "El parque nacional: montaña, bosque y naturaleza.", "WeX9Ga2vuOI", "Todo lo que podrás hacer"),
+REGIONS = [  # (nombre, texto, vídeo, enlace, slug de imagen, antetítulo, encuadre)
+ ("Vice City", "La gran ciudad de Leonida: playa, neón, coches de lujo y vida nocturna hasta el amanecer.", "sDK3RR6bInQ", "Vice City de día vs de noche", "vice-city", "Inspirada en Miami", "35% 50%"),
+ ("Leonida Keys", "Islas, puentes sobre aguas turquesa, embarcaderos y personajes como Cal Hampton.", "INVN9F4vSH8", "Quién es Cal Hampton", "leonida-keys", "Inspirada en los Cayos", "60% 50%"),
+ ("Grassrivers", "Pantanos con caimanes, manglares y hidrodeslizadores entre la niebla.", "_rBw7Wa-IVs", "Los pantanos de GTA 6", "grassrivers", "Inspirada en los Everglades", "70% 50%"),
+ ("Port Gellhorn", "Grúas, pesqueros oxidados y bares de muelle en la zona portuaria e industrial.", "n8qxCiLWi28", "Las 6 regiones", "port-gellhorn", "Puerto e industria", "50% 50%"),
+ ("Ambrosia", "Naranjales, campos de cultivo y pueblos de carretera en el interior de Leonida.", "n8qxCiLWi28", "Las 6 regiones", "ambrosia", "El interior rural", "55% 50%"),
+ ("Mount Kalaga", "El parque nacional: montaña, bosque, lagos y rutas de senderismo.", "WeX9Ga2vuOI", "Todo lo que podrás hacer", "mount-kalaga", "Parque nacional", "22% 50%"),
 ]
 
 CAST = [
@@ -329,7 +329,12 @@ def build_home():
     cats = ["Todos"] + [c for c in ["Personajes", "Leonida", "Música", "Mecánicas", "Historia", "Curiosidades", "Análisis", "Shorts"] if any(v["cat"] == c for v in V)]
     chips = "".join(f'<button type="button" class="chip{" is-on" if c == "Todos" else ""}" data-filter="{c}" aria-pressed="{"true" if c == "Todos" else "false"}">{c}</button>' for c in cats)
     cast = "".join(char_section(c, k, "") for k, c in enumerate(CAST))
-    regions = "".join(f'<article class="region reveal"><h3>{esc(n)}</h3><p>{esc(t)}</p><a href="videos/{BY[i]["slug"]}/">Vídeo: {esc(l)} →</a></article>' for n, t, i, l in REGIONS)
+    regions = "".join(
+        f'<article class="region reveal" style="--pos:{pos}"><img src="assets/leonida/{img}-800.webp" srcset="assets/leonida/{img}-800.webp 800w, assets/leonida/{img}.webp 1600w" sizes="(max-width:760px) 100vw, 60vw" alt="{esc(n)}, región de Leonida en GTA 6" width="1600" height="900" loading="lazy" decoding="async">'
+        f'<span class="region__shade" aria-hidden="true"></span><span class="region__n" aria-hidden="true">0{k}</span>'
+        f'<div class="region__txt"><span class="region__kick px">{esc(kick)}</span><h3>{esc(n)}</h3><p>{esc(t)}</p>'
+        f'<a href="videos/{BY[i]["slug"]}/">Vídeo: {esc(l)} {ARROW}</a></div></article>'
+        for k, (n, t, i, l, img, kick, pos) in enumerate(REGIONS, 1))
     faq = "".join(f'<details><summary>{esc(q)}</summary><p>{esc(a)}</p></details>' for q, a in FAQ)
     body = f'''<main id="main">
 <section class="hero" aria-labelledby="h1">
