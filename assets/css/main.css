@@ -118,6 +118,7 @@ section{position:relative}
 .tag--Personajes{background:rgba(232,44,122,.16);color:#ff7fb2}
 .tag--Leonida{background:rgba(255,200,62,.14);color:var(--oro)}
 .tag--Curiosidades{background:rgba(255,122,89,.16);color:#ffa58c}
+.tag--Música{background:rgba(160,110,255,.18);color:#c9a8ff}
 .card h3{font-family:var(--f-ui);font-weight:700;font-size:var(--fs-h3);line-height:1.12;letter-spacing:.01em}
 .card time{display:block;margin-top:.6rem;color:var(--txt-2);font-size:.92rem}
 .reel__hint{color:var(--txt-2);font-family:var(--f-ui);text-transform:uppercase;letter-spacing:.1em}

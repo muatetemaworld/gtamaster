@@ -230,7 +230,7 @@ BG = {  # fondo -> (alt, object-position)
  "estadio-tropical": ("", "60% 50%"), "humedales-tropicales": ("", "50% 50%"), "paseo-tropical": ("", "75% 40%"),
 }
 CAT_BG = {"Leonida": "everglades-aerodeslizador", "Personajes": "bahia-urbana", "Mecánicas": "atardecer-neon-mar",
-          "Curiosidades": "club-art-deco", "Historia": "boulevard-art-deco", "Análisis": "costa-urbana-pastel", "Shorts": "paseo-tropical"}
+          "Curiosidades": "club-art-deco", "Música": "club-art-deco", "Historia": "boulevard-art-deco", "Análisis": "costa-urbana-pastel", "Shorts": "paseo-tropical"}
 
 def bgimg(key, rel="", cls="bgpar__img", eager=False, idattr=""):
     alt, pos = BG[key]
@@ -287,7 +287,7 @@ def build_home():
     extra = ('<link rel="preload" as="image" href="assets/bg/costa-urbana-pastel-1600.webp" imagesrcset="assets/bg/costa-urbana-pastel-900.webp 900w, assets/bg/costa-urbana-pastel-1600.webp 1600w" imagesizes="100vw" fetchpriority="high">\n')
     h = head(title, desc, SITE + "/", SITE + "/assets/img/og-gta-master.jpg", rel, schema, extra)
     grid = "".join(vcard(v, rel) for v in V)
-    cats = ["Todos"] + [c for c in ["Personajes", "Leonida", "Mecánicas", "Historia", "Curiosidades", "Análisis", "Shorts"] if any(v["cat"] == c for v in V)]
+    cats = ["Todos"] + [c for c in ["Personajes", "Leonida", "Música", "Mecánicas", "Historia", "Curiosidades", "Análisis", "Shorts"] if any(v["cat"] == c for v in V)]
     chips = "".join(f'<button type="button" class="chip{" is-on" if c == "Todos" else ""}" data-filter="{c}" aria-pressed="{"true" if c == "Todos" else "false"}">{c}</button>' for c in cats)
     cast = "".join(char_section(c, k, "") for k, c in enumerate(CAST))
     regions = "".join(f'<article class="region reveal"><h3>{esc(n)}</h3><p>{esc(t)}</p><a href="videos/{BY[i]["slug"]}/">Vídeo: {esc(l)} →</a></article>' for n, t, i, l in REGIONS)
@@ -390,7 +390,7 @@ def build_home():
 # ---------- PÁGINA DE VÍDEO ----------
 GUIA_ANCLA = {"Personajes": ("historia", "Historia y personajes de GTA 6"), "Leonida": ("mapa", "El mapa de GTA 6: Leonida y Vice City"),
               "Mecánicas": ("rendimiento", "Fps, tamaño y cómo funciona GTA 6"), "Historia": ("historia", "La historia de GTA 6"),
-              "Curiosidades": ("musica", "Música, radios y curiosidades de GTA 6"), "Análisis": ("notas", "Notas y análisis de GTA 6"),
+              "Música": ("musica", "Música y radios de GTA 6"), "Curiosidades": ("notas", "Curiosidades y detalles de GTA 6"), "Análisis": ("notas", "Notas y análisis de GTA 6"),
               "Shorts": ("fecha", "Fecha, precio y todo sobre GTA 6")}
 def _palabras(t):
     return {w for w in re.findall(r"[a-záéíóúñ0-9]{4,}", t.lower())} - {"gta", "grand", "theft", "auto", "rockstar", "sobre", "como", "todo", "para", "este", "esta"}
@@ -771,7 +771,7 @@ def build_index():
         {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Inicio", "item": SITE + "/"}, {"@type": "ListItem", "position": 2, "name": "Vídeos de GTA 6", "item": canon}]}]}
     h = head(title, desc, canon, SITE + "/assets/img/og-gta-master.jpg", rel, schema)
     cats = []
-    for c in ["Personajes", "Leonida", "Mecánicas", "Historia", "Curiosidades", "Análisis", "Shorts"]:
+    for c in ["Personajes", "Leonida", "Música", "Mecánicas", "Historia", "Curiosidades", "Análisis", "Shorts"]:
         vs = [v for v in V if v["cat"] == c]
         if vs: cats.append(f'<h2 class="h2" style="font-size:clamp(2rem,1.4rem + 2.5vw,3.6rem);margin:3.5rem 0 1.5rem">GTA 6: {c.lower()}</h2><div class="vgrid">{"".join(vcard(v, rel) for v in vs)}</div>')
     body = f'''<main id="main"><section class="vhero bgpar">{bgimg("horizonte-neon-noche", rel=rel, eager=True)}<span class="bgpar__veil bgpar__veil--vhero" aria-hidden="true"></span><nav class="crumbs" aria-label="Migas de pan"><ol><li><a href="{rel}">Inicio</a></li><li aria-current="page">Vídeos</li></ol></nav>

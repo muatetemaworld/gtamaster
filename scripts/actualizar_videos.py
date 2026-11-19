@@ -20,11 +20,12 @@ UA = {"User-Agent": "Mozilla/5.0 (GTA MASTER web updater)", "Accept-Language": "
 NS = {"a": "http://www.w3.org/2005/Atom", "yt": "http://www.youtube.com/xml/schemas/2015", "media": "http://search.yahoo.com/mrss/"}
 
 CATS = [  # primera coincidencia gana
+    ("Música", ["radio", " fm", "música", "musica", "canción", "cancion", "canciones", "emisora", "banda sonora", "soundtrack", "playlist", "podcast", "mix", "dj "]),
     ("Personajes", ["jason", "lucia", "lucía", "cal hampton", "brian", "personaje", "protagonista", "boobie", "dre'quan", "real dimez"]),
     ("Leonida", ["vice city", "leonida", "mapa", "región", "regiones", "cayos", "keys", "pantano", "grassrivers", "ambrosia", "kalaga", "gellhorn", "everglades"]),
     ("Historia", ["historia", "misión", "mision", "atraco", "robo", "golpe", "trama"]),
     ("Mecánicas", ["policía", "policia", "armas", "coches", "vehículo", "mecánica", "actividad", "podrás hacer", "trucos", "dinero", "online"]),
-    ("Curiosidades", ["curiosidad", "easter", "anuncio", "radio", "secreto", "sabías", "detalle"]),
+    ("Curiosidades", ["curiosidad", "easter", "anuncio", "secreto", "sabías", "detalle"]),
 ]
 
 
