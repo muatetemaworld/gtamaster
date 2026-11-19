@@ -274,7 +274,7 @@ def radio_card(r, rel=""):
     img = os.path.exists(os.path.join(OUT, "assets", "radios", r["slug"] + ".webp"))
     vid = BY.get(r["v"]) if r.get("v") else None
     media = (f'<img src="{rel}assets/radios/{r["slug"]}-360.webp" srcset="{rel}assets/radios/{r["slug"]}-360.webp 360w, {rel}assets/radios/{r["slug"]}.webp 540w" sizes="(max-width:760px) 72vw, 320px" alt="{esc(r["n"])}, emisora de GTA 6" width="540" height="720" loading="lazy" decoding="async">'
-             if img else f'<span class="radio__poster" aria-hidden="true"><b>{esc(r["n"])}</b></span>')
+             if img else f'<span class="radio__poster{" radio__poster--long" if len(r["n"]) > 12 else ""}" aria-hidden="true"><b>{esc(r["n"])}</b></span>')
     cta = (f'<a class="radio__cta" href="{rel}videos/{vid["slug"]}/">Ver vídeo {ARROW}</a>' if vid
            else f'<a class="radio__cta radio__cta--ghost" href="{rel}gta-6/#musica">Más sobre la música {ARROW}</a>')
     return (f'<li class="radio{" radio--img" if img else ""}" style="--c1:{r["c1"]};--c2:{r["c2"]}">'
