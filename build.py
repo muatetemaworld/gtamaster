@@ -450,11 +450,9 @@ def build_home():
 
 <section class="launch sec bgpar" aria-labelledby="t-launch">
   {bgimg("estadio-tropical")}<span class="bgpar__veil bgpar__veil--launch" aria-hidden="true"></span>
-  <div class="wrap"><span class="eyebrow px">Lanzamiento</span><h2 class="h2" id="t-launch">GTA 6 sale el <span class="grad-text">19 de noviembre</span></h2>
-  <p class="lead">PlayStation 5 y Xbox Series X|S. Cuenta atrás hasta las 00:00 del 19 de noviembre, hora peninsular española.</p>
-  <div class="countdown" data-countdown="{LAUNCH}" aria-live="off">
-    <div><b data-u="d">00</b><span class="px">Días</span></div><div><b data-u="h">00</b><span class="px">Horas</span></div><div><b data-u="m">00</b><span class="px">Min</span></div><div><b data-u="s">00</b><span class="px">Seg</span></div>
-  </div></div>
+  <div class="wrap"><span class="eyebrow px">Lanzamiento</span><h2 class="h2" id="t-launch">GTA 6 salió el <span class="grad-text">19 de noviembre</span></h2>
+  <p class="lead">Disponible en PlayStation 5 y Xbox Series X|S desde las 00:00 del 19 de noviembre de 2026, hora peninsular española.</p>
+  <a class="onsale" href="https://www.rockstargames.com/VI" target="_blank" rel="noopener"><b>Ya a la venta</b><span>PS5 · Xbox Series X|S</span><em>Comprar en la web oficial de Rockstar Games {ARROW}</em></a></div>
 </section>
 
 <section class="faq sec bgpar" id="faq" aria-labelledby="t-faq">
@@ -724,7 +722,7 @@ def build_personajes():
 
 # ---------- GUÍA PILAR /gta-6/ ----------
 GUIA_FAQ = [
- ("¿Cuándo sale GTA 6?", "GTA 6 sale el jueves 19 de noviembre de 2026 en PlayStation 5 y Xbox Series X|S. En España se desbloquea a las 00:00 del 19 de noviembre, hora peninsular."),
+ ("¿Cuándo sale GTA 6?", "GTA 6 salió el jueves 19 de noviembre de 2026 en PlayStation 5 y Xbox Series X|S. En España se desbloqueó a las 00:00 del 19 de noviembre, hora peninsular, y ya está a la venta."),
  ("¿Cuánto cuesta GTA 6?", "En España, la edición estándar cuesta 79,99 € y la Ultimate Edition 99,99 €. En Estados Unidos, 79,99 y 99,99 dólares."),
  ("¿GTA 6 sale en PC?", "No en el lanzamiento. Rockstar solo ha anunciado PS5 y Xbox Series X|S y no hay fecha para PC. Take-Two ha dicho que los jugadores de consola son su público principal."),
  ("¿Cuánto ocupa GTA 6?", "Hasta 212 GB, según la consola. La precarga para las reservas digitales empezó el 10 de noviembre."),
@@ -792,7 +790,7 @@ def build_guia():
 <div class="table"><table class="ficha"><caption>Ficha de GTA 6</caption><tbody>{tabla}</tbody></table></div>
 <div class="post__body">
 <h2 id="fecha">Fecha y hora de lanzamiento de GTA 6</h2>
-<p>Grand Theft Auto VI sale el <strong>jueves 19 de noviembre de 2026</strong>. Llega tras dos retrasos: primero estaba previsto para otoño de 2025 y después para el 26 de mayo de 2026. El juego se desbloquea a medianoche, hora local de cada país. En España es a las <strong>00:00 del 19 de noviembre</strong> y en Nueva Zelanda ya se juega desde las 12:00 del día 18, hora peninsular. Tienes todas las horas por país en {pl("gta-6-hora-lanzamiento-espana-nueva-zelanda", "nuestra noticia sobre la hora de lanzamiento")}.</p>
+<p>Grand Theft Auto VI salió el <strong>jueves 19 de noviembre de 2026</strong> y ya está a la venta en la <a href="https://www.rockstargames.com/VI" target="_blank" rel="noopener noreferrer">web oficial de Rockstar Games</a>. Llegó tras dos retrasos: primero estaba previsto para otoño de 2025 y después para el 26 de mayo de 2026. El juego se desbloquea a medianoche, hora local de cada país. En España es a las <strong>00:00 del 19 de noviembre</strong> y en Nueva Zelanda ya se juega desde las 12:00 del día 18, hora peninsular. Tienes todas las horas por país en {pl("gta-6-hora-lanzamiento-espana-nueva-zelanda", "nuestra noticia sobre la hora de lanzamiento")}.</p>
 <h2 id="precio">Precio y ediciones de GTA 6</h2>
 <p>Rockstar vende dos ediciones. En España, la <strong>estándar cuesta 79,99 €</strong> y la <strong>Ultimate Edition, 99,99 €</strong>, según la guía de reserva de Vandal. En Estados Unidos los precios son 79,99 y 99,99 dólares. Las reservas abrieron el 25 de junio de 2026.</p>
 <p>La edición física no incluye disco, sino un código de descarga. Te lo contamos en {vl("caja-vacia", "nuestro vídeo sobre la caja sin disco")}.</p>
