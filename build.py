@@ -22,6 +22,9 @@ _EXC_IDS = {e["id"] for e in EXCLUIDOS}
 V = [x for x in V if x["id"] not in _EXC_IDS]
 V.sort(key=lambda v: v["up"], reverse=True)
 BY = {v["id"]: v for v in V}
+import hashlib
+def _h(p): return hashlib.md5(open(os.path.join(OUT, p), "rb").read()).hexdigest()[:8]
+ASSET_V = {"css": _h("assets/css/main.css"), "js": _h("assets/js/main.js"), "com": _h("assets/js/comentarios.js")}  # rompe la caché al cambiar
 
 def cap(s): return s[:1].upper()+s[1:]
 def esc(s): return html.escape(s, quote=True)
@@ -162,7 +165,7 @@ def head(title, desc, canon, img, rel, schema, extra="", csp=None):
 <link rel="apple-touch-icon" href="{rel}assets/img/icon-180.png">
 <link rel="manifest" href="{rel}site.webmanifest">
 <link rel="stylesheet" href="{rel}assets/css/fonts.css">
-<link rel="stylesheet" href="{rel}assets/css/main.css">
+<link rel="stylesheet" href="{rel}assets/css/main.css?v={ASSET_V["css"]}">
 {extra}<script type="application/ld+json">{ld_json(schema)}</script>
 </head>
 <body>
@@ -192,8 +195,8 @@ def footer(rel):
 </footer>
 <script src="{rel}assets/js/vendor/gsap.min.js" defer></script>
 <script src="{rel}assets/js/vendor/ScrollTrigger.min.js" defer></script>
-<script src="{rel}assets/js/main.js" defer></script>
-<script src="{rel}assets/js/comentarios.js" defer></script>
+<script src="{rel}assets/js/main.js?v={ASSET_V["js"]}" defer></script>
+<script src="{rel}assets/js/comentarios.js?v={ASSET_V["com"]}" defer></script>
 </body>
 </html>
 '''
