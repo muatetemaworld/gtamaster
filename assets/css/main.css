@@ -188,7 +188,9 @@ section{position:relative}
 .footer h2{font-family:var(--f-ui);font-weight:700;text-transform:uppercase;letter-spacing:.1em;font-size:1rem;color:#fff;margin-bottom:.9rem}
 .footer ul{list-style:none;margin:0;padding:0;line-height:1.9}
 .footer a{text-decoration:none}.footer a:hover{color:var(--oro)}
-.footer small{display:block;width:min(1320px,100%);margin:2.5rem auto 0;padding-top:1.5rem;border-top:1px solid var(--line);line-height:1.6}
+.footer__bottom{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:.6rem 2rem;width:min(1320px,100%);margin:2.5rem auto 0;padding-top:1.5rem;border-top:1px solid var(--line)}
+.footer small{font-size:.85rem;line-height:1.6}
+.footer__credit a{color:var(--crema);font-weight:600}.footer__credit a:hover{color:var(--oro)}
 @media (max-width:760px){.footer__grid{grid-template-columns:1fr}}
 
 /* Página de vídeo */

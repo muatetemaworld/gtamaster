@@ -182,16 +182,16 @@ def head(title, desc, canon, img, rel, schema, extra="", csp=None):
 '''
 
 def footer(rel):
-    vids = "".join(f'<li><a href="{rel}videos/{v["slug"]}/">{esc(cap(v["h1"].replace("GTA 6: ","")))}</a></li>' for v in V[:6])
-    vids2 = "".join(f'<li><a href="{rel}videos/{v["slug"]}/">{esc(cap(v["h1"].replace("GTA 6: ","")))}</a></li>' for v in V[6:])
+    vids = "".join(f'<li><a href="{rel}videos/{v["slug"]}/">{esc(cap(v.get("card") or v["h1"].replace("GTA 6: ","")))}</a></li>' for v in V[:4])
     return f'''<footer class="footer">
   <div class="footer__grid">
-    <div><h2>GTA MASTER</h2><p>GTA 6 en español: detalles que no viste, personajes, mapa de Leonida y curiosidades, con material oficial de Rockstar Games.</p>
+    <div><h2>GTA MASTER</h2><p>GTA 6 en español: noticias, guía, personajes y curiosidades de Leonida.</p>
     <p><a class="btn btn--yt" href="{SUB}" target="_blank" rel="noopener">{YT_ICON}<span>Canal de YouTube</span></a></p></div>
+    <div><h2>Explora</h2><ul><li><a href="{rel}gta-6/">Guía de GTA 6</a></li><li><a href="{rel}videos/">Vídeos</a></li><li><a href="{rel}personajes/">Personajes</a></li><li><a href="{rel}blog/">Blog</a></li><li><a href="{rel}#faq">Preguntas</a></li></ul></div>
     <div><h2>Últimos vídeos</h2><ul>{vids}</ul></div>
-    <div><h2>Más análisis</h2><ul>{vids2}<li><a href="{rel}videos/">Todos los vídeos</a></li><li><a href="{rel}blog/">Blog de noticias</a></li><li><a href="{rel}privacidad/">Privacidad y cookies</a></li></ul></div>
   </div>
-  <small>© <span data-year>2026</span> GTA MASTER · Web de fans, no oficial. Grand Theft Auto, GTA y Grand Theft Auto VI son marcas de Take-Two Interactive. Esta web no está afiliada a Rockstar Games ni a Take-Two. Las imágenes de los vídeos son miniaturas del canal GTA MASTER.</small>
+  <div class="footer__bottom"><small>© <span data-year>2026</span> GTA MASTER · Web de fans no oficial, sin relación con Rockstar Games ni Take-Two. · <a href="{rel}privacidad/">Privacidad</a></small>
+  <small class="footer__credit">Diseñado por <a href="https://www.muatetemaworld.com" target="_blank" rel="noopener">Muatetema</a></small></div>
 </footer>
 <script src="{rel}assets/js/vendor/gsap.min.js" defer></script>
 <script src="{rel}assets/js/vendor/ScrollTrigger.min.js" defer></script>
