@@ -130,6 +130,9 @@ def thumbs(vid):
 def main():
     videos = json.load(open(DATA, encoding="utf-8"))
     known = {v["id"] for v in videos}
+    exc = os.path.join(ROOT, "data", "excluidos.json")
+    if os.path.exists(exc):  # vídeos retirados a mano: nunca se vuelven a publicar
+        known |= {e["id"] for e in json.load(open(exc, encoding="utf-8"))}
     slugs = {v["slug"] for v in videos}
     root = ET.fromstring(get(FEED))
     nuevos = []

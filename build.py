@@ -17,6 +17,9 @@ MAD = ZoneInfo("Europe/Madrid")
 MESES = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"]
 
 V = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "videos.json"), encoding="utf-8"))
+EXCLUIDOS = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "excluidos.json"), encoding="utf-8")) if os.path.exists(os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "excluidos.json")) else []
+_EXC_IDS = {e["id"] for e in EXCLUIDOS}
+V = [x for x in V if x["id"] not in _EXC_IDS]
 V.sort(key=lambda v: v["up"], reverse=True)
 BY = {v["id"]: v for v in V}
 
@@ -814,6 +817,22 @@ def build_meta():
 # ---------- validación de datos (barrera contra contenido malicioso) ----------
 # Las tareas automáticas escriben en data/videos.json y data/posts.json a partir
 # de contenido de Internet. Si algo no cumple estas reglas, la web NO se genera.
+def build_excluidos():
+    """Vídeos retirados: su antigua URL redirige (noindex) para no dejar 404."""
+    import shutil
+    for e in EXCLUIDOS:
+        if not re.fullmatch(r"[a-z0-9-]+", e.get("slug", "")): continue
+        d = os.path.join(os.path.dirname(os.path.abspath(__file__)), "videos", e["slug"])
+        if os.path.isdir(d): shutil.rmtree(d)
+        os.makedirs(d, exist_ok=True)
+        dest = "/" + e.get("redirige", "videos/").lstrip("/")
+        if not re.fullmatch(r"/[a-z0-9/-]*", dest): dest = "/videos/"
+        open(os.path.join(d, "index.html"), "w", encoding="utf-8").write(
+            f'<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="robots" content="noindex">'
+            f'<link rel="canonical" href="https://gtamaster.es{dest}"><meta http-equiv="refresh" content="0;url={dest}">'
+            f'<title>Redirigiendo…</title></head><body><a href="{dest}">Ir a GTA MASTER</a></body></html>')
+
+
 def validar():
     errores = []
     rx_slug = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
@@ -858,5 +877,5 @@ if __name__ == "__main__":
     validar()
     build_home()
     for v in V: build_video(v)
-    build_index(); build_posts(); build_blog_index(); build_personajes(); build_privacidad(); build_guia(); build_meta()
+    build_index(); build_posts(); build_blog_index(); build_personajes(); build_privacidad(); build_guia(); build_meta(); build_excluidos()
     print("OK:", len(V), "vídeos")
