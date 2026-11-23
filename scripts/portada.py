@@ -53,11 +53,17 @@ def main():
     ap.add_argument("--fondo", default="horizonte-neon-noche", choices=FONDOS)
     ap.add_argument("--imagen", help="ilustración propia opcional")
     ap.add_argument("--fx", type=float, default=0.62)
+    ap.add_argument("--sin-titulo", action="store_true",
+                    help="la ilustración (ChatGPT) ya trae el titular: solo se añaden insignia, etiqueta y franja")
     a = ap.parse_args()
 
     src = a.imagen or os.path.join(ROOT, "assets", "bg", f"{a.fondo}-1600.webp")
     base = cover_crop(Image.open(src).convert("RGB"), W, H, fx=a.fx).convert("RGBA")
 
+    if a.sin_titulo:
+        draw = ImageDraw.Draw(base)
+        _marca(draw, base, a)
+        return _guardar(base, a)
     # Velado para que el titular se lea: oscuro a la izquierda y abajo
     shade = Image.new("RGBA", (W, H), (0, 0, 0, 0)); d = ImageDraw.Draw(shade)
     for x in range(W):
@@ -68,6 +74,12 @@ def main():
     base.alpha_composite(shade)
 
     draw = ImageDraw.Draw(base)
+    _marca(draw, base, a)
+    _titular(draw, base, a)
+    _guardar(base, a)
+
+
+def _marca(draw, base, a):
     # Franja de marca (degradado cian > magenta > oro)
     stops = [(60, 208, 226), (232, 44, 122), (255, 122, 89), (255, 200, 62)]
     for x in range(W):
@@ -86,6 +98,8 @@ def main():
     draw.rounded_rectangle([166, 76, 166 + lw + 36, 76 + 44], radius=10, fill=(232, 44, 122, 235))
     draw.text((184, 87), label, font=px, fill=(255, 255, 255))
 
+
+def _titular(draw, base, a):
     # Titular
     font, lines = fit_title(draw, a.titulo, os.path.join(FONTS, "Anton.ttf"), max_w=760, max_lines=4)
     lh = int(font.size * 1.13)
@@ -97,6 +111,8 @@ def main():
     for n, l in enumerate(lines):
         draw.text((60, y0 + n * lh), l, font=font, fill=(255, 243, 209))
 
+
+def _guardar(base, a):
     out = os.path.join(ROOT, "assets", "blog"); os.makedirs(out, exist_ok=True)
     rgb = base.convert("RGB")
     rgb.save(os.path.join(out, f"{a.slug}.jpg"), "JPEG", quality=86, optimize=True, progressive=True)
