@@ -511,3 +511,4 @@ a.player__btn,a.vcard__play{text-decoration:none}
 .mapa__zonas a{color:var(--crema);font-weight:600;text-decoration:none}
 .mapa__cta{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:.6rem 1rem;margin-top:2.2rem;text-align:center}
 .mapa__cta small{color:rgba(255,248,231,.75)}
+.mapa__gate[hidden]{display:none}
