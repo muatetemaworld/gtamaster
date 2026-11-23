@@ -322,7 +322,9 @@ def cat_videos(c): return [v for v in V if v["cat"] == c]
 def cat_card(c, slug, frase, color, rel, k):
     vs = cat_videos(c); v = vs[0]
     n = len(vs)
-    return (f'<article class="ccard reveal" style="--cc:{color}"><img src="{rel}assets/thumbs/{v["id"]}-v.webp" width="540" height="720" alt="" loading="lazy" decoding="async">'
+    portada = f"assets/cats/{slug}.webp"  # portada propia de la categoría (ChatGPT); si no existe, miniatura vertical del último vídeo
+    src = portada if os.path.exists(os.path.join(OUT, portada)) else f'assets/thumbs/{v["id"]}-v.webp'
+    return (f'<article class="ccard reveal" style="--cc:{color}"><img src="{rel}{src}" width="540" height="720" alt="" loading="lazy" decoding="async">'
             f'<span class="ccard__shade" aria-hidden="true"></span><span class="ccard__count px">{n} vídeo{"s" if n != 1 else ""}</span>'
             f'<div class="ccard__body"><h3>{esc(c)}</h3><p>{esc(frase)}</p>'
             f'<a class="ccard__btn{" ccard__btn--fill" if k == 0 else ""}" href="{rel}videos/{slug}/">Ver {"los " + str(n) if n > 1 else "el vídeo"} {ARROW}</a></div></article>')

@@ -15,3 +15,5 @@ Para cambiar el dominio, edita `SITE` en `build.py`.
 - El titular de 1–3 palabras va dentro de la ilustración, en tipografía cartel GTA 6. La esquina superior izquierda queda libre.
 - Se monta con `python3 scripts/portada.py --slug <slug> --titulo "<titular>" --etiqueta <categoría> --imagen <png> --sin-titulo`, que añade la insignia, la etiqueta y la franja sin estirar.
 - Ya no se usan los fondos de `assets/bg` sin personajes como portada.
+- Portadas de categoría: `assets/cats/<slug>.webp`, generadas con ChatGPT en vertical 3:4, sin texto y con personajes inventados. Se montan con `python3 scripts/portada_categoria.py <png> <slug>`. Si una categoría no tiene portada, se usa la miniatura vertical de su último vídeo.
+- Diseño adaptable: las cuadrículas de categorías, vídeos y filtros centran siempre la última fila (4 columnas en ordenador, 3 en tablet y 2 en móvil).
