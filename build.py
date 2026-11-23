@@ -22,6 +22,7 @@ _EXC_IDS = {e["id"] for e in EXCLUIDOS}
 V = [x for x in V if x["id"] not in _EXC_IDS]
 V.sort(key=lambda v: v["up"], reverse=True)
 BY = {v["id"]: v for v in V}
+LARGOS = [v for v in V if v["cat"] != "Shorts"]  # los Shorts solo se ven en su pestaña (/videos/shorts/)
 import hashlib
 def _h(p): return hashlib.md5(open(os.path.join(OUT, p), "rb").read()).hexdigest()[:8]
 ASSET_V = {"css": _h("assets/css/main.css"), "js": _h("assets/js/main.js"), "com": _h("assets/js/comentarios.js")}  # rompe la caché al cambiar
@@ -182,7 +183,7 @@ def head(title, desc, canon, img, rel, schema, extra="", csp=None):
 '''
 
 def footer(rel):
-    vids = "".join(f'<li><a href="{rel}videos/{v["slug"]}/">{esc(cap(v.get("card") or v["h1"].replace("GTA 6: ","")))}</a></li>' for v in V[:4])
+    vids = "".join(f'<li><a href="{rel}videos/{v["slug"]}/">{esc(cap(v.get("card") or v["h1"].replace("GTA 6: ","")))}</a></li>' for v in LARGOS[:4])
     return f'''<footer class="footer">
   <div class="footer__grid">
     <div><h2>GTA MASTER</h2><p>GTA 6 en español: noticias, guía, personajes y curiosidades de Leonida.</p>
@@ -338,7 +339,7 @@ def build_categorias():
             {"@type": "ItemList", "itemListElement": [{"@type": "ListItem", "position": i + 1, "url": vurl(v)} for i, v in enumerate(vs)]},
             {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Inicio", "item": SITE + "/"}, {"@type": "ListItem", "position": 2, "name": "Vídeos", "item": SITE + "/videos/"}, {"@type": "ListItem", "position": 3, "name": c, "item": canon}]}]}
         h = head(title, desc, canon, f"{SITE}/assets/thumbs/{vs[0]['id']}.jpg", rel, schema)
-        otras = "".join(f'<a class="chip{" is-on" if s == slug else ""}" href="{rel}videos/{s}/"{" aria-current=\"page\"" if s == slug else ""}>{esc(n)}</a>' for n, s, _, _ in activas)
+        otras = f'<a class="chip" href="{rel}videos/">Todos</a>' + "".join(f'<a class="chip{" is-on" if s == slug else ""}" href="{rel}videos/{s}/"{" aria-current=\"page\"" if s == slug else ""}>{esc(n)}</a>' for n, s, _, _ in activas)
         body = f'''<main id="main"><section class="vhero bgpar">{bgimg("horizonte-neon-noche", rel=rel, eager=True)}<span class="bgpar__veil bgpar__veil--vhero" aria-hidden="true"></span><nav class="crumbs" aria-label="Migas de pan"><ol><li><a href="{rel}">Inicio</a></li><li><a href="{rel}videos/">Vídeos</a></li><li aria-current="page">{esc(c)}</li></ol></nav>
 <h1>Vídeos de GTA 6: {esc(c.lower())}</h1><p class="lead">{esc(frase)} {len(vs)} vídeo{"s" if len(vs) != 1 else ""} en español.</p></section>
 <div class="wrap" style="padding-bottom:5rem"><nav class="chips" aria-label="Categorías de vídeos">{otras}</nav><div class="vgrid">{"".join(vcard(v, rel) for v in vs)}</div>
@@ -374,7 +375,7 @@ def build_home():
         f'<article class="region reveal" style="--pos:{pos}"><img src="assets/leonida/{img}-800.webp" srcset="assets/leonida/{img}-800.webp 800w, assets/leonida/{img}.webp 1600w" sizes="(max-width:760px) 100vw, 60vw" alt="{esc(n)}, región de Leonida en GTA 6" width="1600" height="900" loading="lazy" decoding="async">'
         f'<span class="region__shade" aria-hidden="true"></span><span class="region__n" aria-hidden="true">0{k}</span>'
         f'<div class="region__txt"><span class="region__kick px">{esc(kick)}</span><h3>{esc(n)}</h3><p>{esc(t)}</p>'
-        f'<a href="videos/{BY[i]["slug"]}/">Vídeo: {esc(l)} {ARROW}</a></div></article>'
+        + (f'<a href="videos/{BY[i]["slug"]}/">Vídeo: {esc(l)} {ARROW}</a>' if i in BY else f'<a href="gta-6/#mapa">El mapa de GTA 6 {ARROW}</a>') + '</div></article>'
         for k, (n, t, i, l, img, kick, pos) in enumerate(REGIONS, 1))
     faq = "".join(f'<details><summary>{esc(q)}</summary><p>{esc(a)}</p></details>' for q, a in FAQ)
     body = f'''<main id="main">
@@ -494,7 +495,7 @@ def build_video(v):
     rel = "../../"
     canon = vurl(v)
     related = [x for x in V if x["id"] != v["id"] and x["cat"] == v["cat"]][:3]
-    related += [x for x in V if x["id"] != v["id"] and x not in related][: 5 - len(related)]
+    related += [x for x in LARGOS if x["id"] != v["id"] and x not in related][: 5 - len(related)]
     schema = {"@context": "https://schema.org", "@graph": [
         ORG, video_obj(v),
         {"@type": "WebPage", "@id": canon, "url": canon, "name": v["title"], "description": v["desc"], "inLanguage": "es",
@@ -851,16 +852,17 @@ def build_index():
     desc = "Todos los vídeos de GTA 6 de GTA MASTER: personajes, mapa de Leonida, Vice City, policía, curiosidades y detalles que no viste de GTA VI."
     schema = {"@context": "https://schema.org", "@graph": [ORG,
         {"@type": "CollectionPage", "@id": canon, "url": canon, "name": title, "description": desc, "inLanguage": "es", "isPartOf": {"@id": SITE + "/#web"}},
-        {"@type": "ItemList", "itemListElement": [{"@type": "ListItem", "position": i + 1, "url": vurl(v)} for i, v in enumerate(V)]},
+        {"@type": "ItemList", "itemListElement": [{"@type": "ListItem", "position": i + 1, "url": vurl(v)} for i, v in enumerate(LARGOS)]},
         {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Inicio", "item": SITE + "/"}, {"@type": "ListItem", "position": 2, "name": "Vídeos de GTA 6", "item": canon}]}]}
     h = head(title, desc, canon, SITE + "/assets/img/og-gta-master.jpg", rel, schema)
     cats = []
-    for c in ["Personajes", "Leonida", "Música", "Mecánicas", "Historia", "Curiosidades", "Análisis", "Shorts"]:
+    for c in ["Personajes", "Leonida", "Música", "Mecánicas", "Historia", "Curiosidades", "Análisis"]:  # los Shorts van en su pestaña
         vs = [v for v in V if v["cat"] == c]
         if vs: cats.append(f'<h2 class="h2" id="{unicodedata.normalize("NFKD", c).encode("ascii","ignore").decode().lower()}" style="font-size:clamp(2rem,1.4rem + 2.5vw,3.6rem);margin:3.5rem 0 1.5rem">GTA 6: {c.lower()}</h2><div class="vgrid">{"".join(vcard(v, rel) for v in vs)}</div>')
+    tabs = '<a class="chip is-on" href="./" aria-current="page">Todos</a>' + "".join(f'<a class="chip" href="{rel}videos/{s}/">{esc(n)}</a>' for n, s, _, _ in CATS if cat_videos(n))
     body = f'''<main id="main"><section class="vhero bgpar">{bgimg("horizonte-neon-noche", rel=rel, eager=True)}<span class="bgpar__veil bgpar__veil--vhero" aria-hidden="true"></span><nav class="crumbs" aria-label="Migas de pan"><ol><li><a href="{rel}">Inicio</a></li><li aria-current="page">Vídeos</li></ol></nav>
-<h1>Vídeos de GTA 6 en español</h1><p class="lead">{len(V)} análisis de Grand Theft Auto VI ordenados por tema. Todos hechos con material oficial.</p></section>
-<div class="wrap" style="padding-bottom:5rem">{"".join(cats)}</div></main>
+<h1>Vídeos de GTA 6 en español</h1><p class="lead">{len(LARGOS)} análisis de Grand Theft Auto VI ordenados por tema. Todos hechos con material oficial.</p></section>
+<div class="wrap" style="padding-bottom:5rem"><nav class="chips" aria-label="Categorías de vídeos">{tabs}</nav>{"".join(cats)}</div></main>
 '''
     d = os.path.join(OUT, "videos"); os.makedirs(d, exist_ok=True)
     open(os.path.join(d, "index.html"), "w").write(h + body + footer(rel))
