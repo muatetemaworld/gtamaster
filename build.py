@@ -25,7 +25,7 @@ BY = {v["id"]: v for v in V}
 LARGOS = [v for v in V if v["cat"] != "Shorts"]  # los Shorts solo se ven en su pestaña (/videos/shorts/)
 import hashlib
 def _h(p): return hashlib.md5(open(os.path.join(OUT, p), "rb").read()).hexdigest()[:8]
-ASSET_V = {"css": _h("assets/css/main.css"), "js": _h("assets/js/main.js"), "com": _h("assets/js/comentarios.js")}  # rompe la caché al cambiar
+ASSET_V = {"css": _h("assets/css/main.css"), "js": _h("assets/js/main.js"), "com": _h("assets/js/comentarios.js"), "mapa": _h("assets/js/mapa.js")}  # rompe la caché al cambiar
 
 def cap(s): return s[:1].upper()+s[1:]
 def esc(s): return html.escape(s, quote=True)
@@ -101,6 +101,7 @@ CSP = ("default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline';
 
 # Comentarios con Disqus (solo en las noticias del blog y solo si el lector los abre).
 DISQUS = "gtamaster-es"
+CSP_MAPA = CSP.replace("frame-src ", "frame-src https://mapgenie.io ")
 CSP_COMENTARIOS = ("default-src 'self'; script-src 'self' https://*.disqus.com https://*.disquscdn.com; "
        "style-src 'self' 'unsafe-inline' https://*.disquscdn.com; img-src 'self' data: https://*.disqus.com https://*.disquscdn.com; "
        "font-src 'self' https://*.disquscdn.com; connect-src 'self' https://*.disqus.com; media-src 'self'; "
@@ -176,7 +177,7 @@ def head(title, desc, canon, img, rel, schema, extra="", csp=None):
 <header class="nav">
   <a class="nav__brand" href="{rel or './'}" aria-label="GTA MASTER, inicio"><img src="{rel}assets/img/icon-192.png" width="46" height="46" alt=""><span>GTA MASTER</span></a>
   <nav aria-label="Principal"><ul class="nav__links">
-    <li><a href="{rel}gta-6/">Guía GTA 6</a></li><li><a href="{rel}#videos">Vídeos</a></li><li><a href="{rel}personajes/">Personajes</a></li><li><a href="{rel}#leonida">Leonida</a></li><li><a href="{rel}blog/">Blog</a></li><li><a href="{rel}#faq">Preguntas</a></li>
+    <li><a href="{rel}gta-6/">Guía GTA 6</a></li><li><a href="{rel}#videos">Vídeos</a></li><li><a href="{rel}personajes/">Personajes</a></li><li><a href="{rel}#leonida">Leonida</a></li><li><a href="{rel}mapa/">Mapa</a></li><li><a href="{rel}blog/">Blog</a></li><li><a href="{rel}#faq">Preguntas</a></li>
   </ul></nav>
   <a class="btn btn--yt" href="{SUB}" target="_blank" rel="noopener">{YT_ICON}<span>Suscríbete</span></a>
 </header>
@@ -188,7 +189,7 @@ def footer(rel):
   <div class="footer__grid">
     <div><h2>GTA MASTER</h2><p>GTA 6 en español: noticias, guía, personajes y curiosidades de Leonida.</p>
     <p><a class="btn btn--yt" href="{SUB}" target="_blank" rel="noopener">{YT_ICON}<span>Canal de YouTube</span></a></p></div>
-    <div><h2>Explora</h2><ul><li><a href="{rel}gta-6/">Guía de GTA 6</a></li><li><a href="{rel}videos/">Vídeos</a></li><li><a href="{rel}personajes/">Personajes</a></li><li><a href="{rel}blog/">Blog</a></li><li><a href="{rel}#faq">Preguntas</a></li></ul></div>
+    <div><h2>Explora</h2><ul><li><a href="{rel}gta-6/">Guía de GTA 6</a></li><li><a href="{rel}videos/">Vídeos</a></li><li><a href="{rel}personajes/">Personajes</a></li><li><a href="{rel}mapa/">Mapa interactivo</a></li><li><a href="{rel}blog/">Blog</a></li><li><a href="{rel}#faq">Preguntas</a></li></ul></div>
     <div><h2>Últimos vídeos</h2><ul>{vids}</ul></div>
   </div>
   <div class="footer__bottom"><small>© <span data-year>2026</span> GTA MASTER · Web de fans no oficial, sin relación con Rockstar Games ni Take-Two. · <a href="{rel}privacidad/">Privacidad</a></small>
@@ -448,7 +449,8 @@ def build_home():
   {bgimg("everglades-aerodeslizador")}<span class="bgpar__veil" aria-hidden="true"></span>
   <div class="wrap"><span class="eyebrow px reveal">El mapa</span><h2 class="h2 reveal" id="t-leo">Leonida, <span class="grad-text">zona a zona</span></h2>
   <p class="lead reveal">El estado ficticio de GTA 6, inspirado en Florida, se divide en seis regiones. De los rascacielos de Vice City a los pantanos de Grassrivers.</p>
-  <div class="regions">{regions}</div></div>
+  <div class="regions">{regions}</div>
+  <p class="mapa__cta reveal"><a class="pill pill--light" href="mapa/"><span>Abrir el mapa interactivo de Leonida</span>{ARROW}</a><small>Mapa de MapGenie</small></p></div>
 </section>
 
 <section class="launch sec bgpar" aria-labelledby="t-launch">
@@ -811,6 +813,7 @@ def build_guia():
 <p>Los protagonistas son {vl("jason-duval", "Jason Duval")}, un exmilitar que acaba trabajando para traficantes en los Cayos, y {vl("gta-6-lucia", "Lucia Caminos")}, recién salida de la Penitenciaría de Leonida. Es la primera vez que un GTA principal tiene protagonista femenina. El reparto confirmado incluye a {pjs}. Tienes sus fichas en la página de <a href="{rel}personajes/">personajes de GTA 6</a> y la trama de Megamundo en {pl("gta-6-megamundo-andres-de-leon-petra-navarro", "quién es quién en Megamundo")}.</p>
 <h2 id="mapa">El mapa de GTA 6: Leonida y Vice City</h2>
 <p>GTA 6 transcurre en <strong>Leonida</strong>, un estado ficticio inspirado en Florida. Su gran ciudad es Vice City, inspirada en Miami, que según Rob Nelson es el <strong>doble de grande que Los Santos</strong> de GTA V. Alrededor hay zonas como los Cayos, los pantanos de Grassrivers, Port Gellhorn, Ambrosia y Mount Kalaga. Míralo en {vl("mapa-leonida", "las 6 regiones de Leonida")}, {vl("grassrivers", "los pantanos de Grassrivers")} y {vl("vice-city-dia-noche", "Vice City de día y de noche")}.</p>
+<p>Para encontrar bancos, cajeros, tiendas, garajes o coleccionables, usa nuestro <a href="{rel}mapa/">mapa interactivo de GTA 6</a>, que muestra el mapa de Leonida de MapGenie.</p>
 <h2 id="musica">Música y radios de GTA 6</h2>
 <p>La banda sonora original es del dúo francés <strong>Justice</strong>, que estrenó «Flower in a Hurricane» con el tráiler de lanzamiento. Entre las emisoras destacan {vl("cocoteo-fm", "Cocoteo FM, la radio latina con Bad Bunny")} y {vl("por-que-afrobank", "AfroBank FM, la de música africana")}, y por primera vez la radio y los podcasts te siguen también a pie. Más en {pl("gta-6-banda-sonora-justice", "la banda sonora de Justice")}.</p>
 <h2 id="trucos">Trucos de GTA 6</h2>
@@ -826,10 +829,54 @@ def build_guia():
     d = os.path.join(OUT, "gta-6"); os.makedirs(d, exist_ok=True)
     open(os.path.join(d, "index.html"), "w").write(h + body + footer(rel))
 
+MAPA_FUENTE = "https://mapgenie.io/grand-theft-auto-6/maps/leonida"
+
+def build_mapa():
+    rel = "../"; canon = SITE + "/mapa/"
+    title = "Mapa interactivo de GTA 6: Leonida completo | GTA MASTER"
+    desc = "Mapa interactivo de GTA 6 en español: todo Leonida con bancos, cajeros, tiendas, vehículos y coleccionables. Mapa de MapGenie con filtros, búsqueda y modo noche."
+    schema = {"@context": "https://schema.org", "@graph": [ORG,
+        {"@type": "WebPage", "@id": canon, "url": canon, "name": title, "description": desc, "inLanguage": "es", "isPartOf": {"@id": SITE + "/#web"},
+         "about": {"@type": "VideoGame", "name": "Grand Theft Auto VI"},
+         "citation": {"@type": "WebPage", "name": "Official Grand Theft Auto 6 Map", "url": MAPA_FUENTE, "publisher": {"@type": "Organization", "name": "MapGenie", "url": "https://mapgenie.io"}}},
+        {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Inicio", "item": SITE + "/"}, {"@type": "ListItem", "position": 2, "name": "Mapa interactivo", "item": canon}]}]}
+    h = head(title, desc, canon, SITE + "/assets/leonida/vice-city.webp", rel, schema, csp=CSP_MAPA)
+    zonas = "".join(f'<li><a href="{rel}#leonida">{esc(n)}</a> · {esc(k)}</li>' for n, t, i, l, img, k, pos in REGIONS)
+    body = f'''<main id="main"><section class="vhero bgpar">{bgimg("horizonte-neon-noche", rel=rel, eager=True)}<span class="bgpar__veil bgpar__veil--vhero" aria-hidden="true"></span><nav class="crumbs" aria-label="Migas de pan"><ol><li><a href="{rel}">Inicio</a></li><li aria-current="page">Mapa interactivo</li></ol></nav>
+<h1>Mapa interactivo de GTA 6</h1><p class="lead">Todo Leonida en un solo mapa: Vice City, los Cayos, Grassrivers, Port Gellhorn, Ambrosia y Mount Kalaga, con bancos, cajeros, tiendas, vehículos y mucho más.</p></section>
+<div class="wrap mapa" style="padding-bottom:5rem">
+  <p class="mapa__fuente"><strong>Fuente del mapa:</strong> <a href="{MAPA_FUENTE}" target="_blank" rel="noopener">MapGenie · Official Grand Theft Auto 6 Map</a>. Lo mostramos con el código de inserción oficial que ofrece MapGenie; el mapa, sus marcadores y sus datos son de MapGenie (mapgenie.io), no de GTA MASTER.</p>
+  <div class="mapa__box" id="mapa-interactivo">
+    <div class="mapa__gate">
+      <img src="{rel}assets/leonida/vice-city-800.webp" srcset="{rel}assets/leonida/vice-city-800.webp 800w, {rel}assets/leonida/vice-city.webp 1600w" sizes="100vw" alt="" width="1600" height="900" decoding="async">
+      <div class="mapa__gatecopy"><span class="px">Leonida · mapa completo</span><h2>Explora Leonida</h2>
+      <button type="button" class="mapa__btn">Cargar el mapa interactivo {ARROW}</button>
+      <small>Se carga desde mapgenie.io, que puede usar sus propias cookies. Más información en nuestra <a href="{rel}privacidad/">política de privacidad</a>.</small></div>
+    </div>
+  </div>
+  <p class="mapa__pie">Mapa: <a href="{MAPA_FUENTE}" target="_blank" rel="noopener">MapGenie (mapgenie.io)</a> · Grand Theft Auto VI © Rockstar Games · <a href="{MAPA_FUENTE}" target="_blank" rel="noopener">Abrir el mapa a pantalla completa en MapGenie</a></p>
+  <section class="mapa__info">
+    <h2 class="h2" style="font-size:clamp(2rem,1.4rem + 2.5vw,3.4rem)">Cómo usar el mapa de GTA 6</h2>
+    <ul class="mapa__tips">
+      <li><b>Filtra por categoría.</b> En el panel de la izquierda activa o apaga cada tipo de punto: puntos de interés, atracos, vehículos, ropa y estilo, comida y bebida.</li>
+      <li><b>Busca un lugar.</b> Escribe el nombre de una tienda, un garaje o una zona en el buscador del panel.</li>
+      <li><b>Día y noche.</b> Cambia el aspecto del mapa con los botones Day y Night de la esquina inferior derecha.</li>
+      <li><b>Guarda tu progreso.</b> Con una cuenta gratuita de MapGenie puedes marcar lo que ya has encontrado.</li>
+    </ul>
+    <h2 class="h2" style="font-size:clamp(2rem,1.4rem + 2.5vw,3.4rem);margin-top:3rem">Las 6 regiones de Leonida</h2>
+    <ul class="mapa__zonas">{zonas}</ul>
+    <p><a class="pill pill--ghost" href="{rel}gta-6/#mapa"><span>El mapa en la guía de GTA 6</span>{ARROW}</a></p>
+  </section>
+</div></main>
+<script src="{rel}assets/js/mapa.js?v={ASSET_V["mapa"]}" defer></script>
+'''
+    d = os.path.join(OUT, "mapa"); os.makedirs(d, exist_ok=True)
+    open(os.path.join(d, "index.html"), "w").write(h + body + footer(rel))
+
 def build_privacidad():
     rel = "../"; canon = SITE + "/privacidad/"
     title = "Política de privacidad y cookies | GTA MASTER"
-    desc = "Qué datos trata GTA MASTER, qué servicios externos usa (YouTube y Disqus) y cómo funcionan sus cookies."
+    desc = "Qué datos trata GTA MASTER, qué servicios externos usa (YouTube, Disqus y MapGenie) y cómo funcionan sus cookies."
     schema = {"@context": "https://schema.org", "@graph": [ORG, {"@type": "WebPage", "@id": canon, "url": canon, "name": title, "inLanguage": "es"}]}
     h = head(title, desc, canon, SITE + "/assets/img/og-gta-master.jpg", rel, schema).replace(
         '<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">', '<meta name="robots" content="noindex, follow">')
@@ -842,6 +889,7 @@ def build_privacidad():
 <h2>Vídeos de YouTube</h2><p>Los vídeos de las noticias se muestran con el modo de privacidad mejorada de YouTube (youtube-nocookie.com). YouTube solo guarda información cuando le das al play. Los botones «Ver en YouTube» te llevan a youtube.com, que tiene su propia política de privacidad y cookies.</p>
 <h2>Comentarios (Disqus)</h2><p>Los comentarios del blog funcionan con Disqus. No se carga nada de Disqus hasta que pulsas «Ver y escribir comentarios»: al hacerlo, aceptas conectar con Disqus, que puede usar cookies y tratar tus datos según su <a href="https://help.disqus.com/en/articles/1717103-disqus-privacy-policy" target="_blank" rel="noopener">política de privacidad</a>. Si comentas, lo que publiques (nombre, foto de perfil y mensaje) es público. Puedes borrar tus comentarios y tu cuenta desde Disqus.</p>
 <h2>Normas de la comunidad</h2><ul><li>Sin spoilers sin avisar.</li><li>Respeto: nada de insultos, odio ni acoso.</li><li>Sin enlaces a filtraciones, piratería ni estafas.</li></ul><p>Podemos borrar los comentarios que no las cumplan y bloquear a quien las incumpla de forma repetida.</p>
+<h2>Mapa interactivo (MapGenie)</h2><p>La página del mapa muestra el mapa de GTA 6 de MapGenie con su código de inserción oficial. No se conecta con MapGenie hasta que pulsas «Cargar el mapa interactivo»: al hacerlo, MapGenie puede usar cookies y tratar datos según su propia política de privacidad, disponible en mapgenie.io.</p>
 <h2>Tus derechos</h2><p>Puedes pedir acceso, rectificación o supresión de tus datos escribiéndonos a través del canal o directamente a Disqus en lo que se refiere a los comentarios. También puedes reclamar ante la Agencia Española de Protección de Datos (aepd.es).</p>
 </div></div></main>
 '''
@@ -871,7 +919,7 @@ def build_index():
 
 def build_meta():
     today = datetime.now(MAD).strftime("%Y-%m-%d")
-    urls = [(SITE + "/", today, "daily", "1.0"), (SITE + "/videos/", today, "daily", "0.9"), (SITE + "/blog/", today, "daily", "0.9"), (SITE + "/personajes/", today, "weekly", "0.9"), (SITE + "/gta-6/", today, "daily", "1.0")] + [(f"{SITE}/videos/{s}/", today, "daily", "0.8") for c, s, _, _ in CATS if cat_videos(c)]
+    urls = [(SITE + "/", today, "daily", "1.0"), (SITE + "/videos/", today, "daily", "0.9"), (SITE + "/blog/", today, "daily", "0.9"), (SITE + "/personajes/", today, "weekly", "0.9"), (SITE + "/gta-6/", today, "daily", "1.0"), (SITE + "/mapa/", today, "weekly", "0.9")] + [(f"{SITE}/videos/{s}/", today, "daily", "0.8") for c, s, _, _ in CATS if cat_videos(c)]
     urls += [(purl(p), p.get("updated", p["date"])[:10], "weekly", "0.8") for p in POSTS]
     vids = []
     for v in V:
@@ -893,6 +941,7 @@ def build_meta():
             f"- Canal de YouTube: {CHANNEL}", f"- Lanzamiento de GTA 6: 19 de noviembre de 2026, PS5 y Xbox Series X|S", "", "## Vídeos"]
     llms += [f"- [{v['h1']}]({vurl(v)}): {v['desc']}" for v in V]
     llms += ["", "## Guía de GTA 6", f"- [GTA 6: todo lo que sabemos]({SITE}/gta-6/): fecha y hora de lanzamiento, precio y ediciones, PC, tamaño, fps, duración, mapa, personajes, música y trucos."]
+    llms += ["", "## Mapa de GTA 6", f"- [Mapa interactivo de GTA 6]({SITE}/mapa/): mapa completo de Leonida de MapGenie (mapgenie.io), insertado con su código oficial."]
     llms += ["", "## Personajes de GTA 6", f"- [Todos los personajes]({SITE}/personajes/): " + ", ".join(c["n"] for c in CAST)]
     llms += ["", "## Noticias (blog)"] + [f"- [{p['title']}]({purl(p)}): {p['desc']}" for p in POSTS[:20]]
     llms += ["", "## Páginas", f"- [Inicio]({SITE}/): resumen del canal, personajes, regiones de Leonida y preguntas frecuentes", f"- [Todos los vídeos]({SITE}/videos/)"]
@@ -968,5 +1017,5 @@ if __name__ == "__main__":
     validar()
     build_home()
     for v in V: build_video(v)
-    build_index(); build_categorias(); build_posts(); build_blog_index(); build_personajes(); build_privacidad(); build_guia(); build_meta(); build_excluidos()
+    build_index(); build_categorias(); build_posts(); build_blog_index(); build_personajes(); build_privacidad(); build_mapa(); build_guia(); build_meta(); build_excluidos()
     print("OK:", len(V), "vídeos")

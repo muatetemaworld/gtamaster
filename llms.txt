@@ -45,6 +45,9 @@
 ## Guía de GTA 6
 - [GTA 6: todo lo que sabemos](https://gtamaster.es/gta-6/): fecha y hora de lanzamiento, precio y ediciones, PC, tamaño, fps, duración, mapa, personajes, música y trucos.
 
+## Mapa de GTA 6
+- [Mapa interactivo de GTA 6](https://gtamaster.es/mapa/): mapa completo de Leonida de MapGenie (mapgenie.io), insertado con su código oficial.
+
 ## Personajes de GTA 6
 - [Todos los personajes](https://gtamaster.es/personajes/): Jason Duval, Lucia Caminos, Raul Bautista, Brian Heder, Boobie Ike, Cal Hampton, Dre'Quan Priest, Real Dimez, Andrés de León, Petra Navarro
 
