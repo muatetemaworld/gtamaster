@@ -576,6 +576,11 @@ def md(text, rel):
     for block in [b.strip() for b in re.split(r"\n\s*\n", text) if b.strip()]:
         m = re.match(r"^\{\{youtube:([\w-]{11})\s*\|\s*(.+?)\}\}$", block)
         if m: out.append(yt_embed(m.group(1), m.group(2))); continue
+        # Captura propia del blog: {{captura:nombre.webp | Pie de foto}} -> assets/blog/capturas/nombre.webp (solo archivos locales)
+        m = re.match(r"^\{\{captura:([a-z0-9]+(?:-[a-z0-9]+)*\.webp)\s*\|\s*(.+?)\}\}$", block)
+        if m and os.path.exists(os.path.join(OUT, "assets", "blog", "capturas", m.group(1))):
+            out.append(f'<figure class="post__cover yt"><img src="{rel}assets/blog/capturas/{m.group(1)}" width="1280" height="720" '
+                       f'alt="{esc(re.sub(r"\[([^\]]+)\]\([^)]*\)", r"\1", m.group(2)).replace("**", ""))}" loading="lazy" decoding="async"><figcaption>{_inline(m.group(2), rel)}</figcaption></figure>'); continue
         if block.startswith("### "): out.append(f"<h3>{_inline(block[4:], rel)}</h3>"); continue
         if block.startswith("## "): out.append(f"<h2>{_inline(block[3:], rel)}</h2>"); continue
         lines = block.split("\n")
